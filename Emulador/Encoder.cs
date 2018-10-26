@@ -19,13 +19,13 @@ namespace Emulador {
             int linha;
             string fonte;
 
-            for(int i = 0; i < entradas.Count; i++) {
+            for (int i = 0; i < entradas.Count; i++) {
                 linha = i;
                 fonte = entradas[linha][0];
                 insereCodigoEmGrupoUm();
             }
 
-            void insereCodigoEmGrupoUm(){
+            void insereCodigoEmGrupoUm() {
                 if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
                     entradas[linha][1] = "1";
                 }
@@ -138,8 +138,36 @@ namespace Emulador {
                     entradas[linha][1] = "25";
                 }
             }
-        } 
+        }
 
-        
+        public static void codificaRegistradores(List<List<string>> entradas) {
+
+            foreach (var instrucao in entradas) {
+
+                for (int i = 1; i < instrucao.Count; i++) {
+
+                    if (Regex.IsMatch(instrucao[i], @"([E-Z])")) {
+                        Console.WriteLine("\n***** ERRO *****\n");
+                        Console.WriteLine("Registrador " + instrucao[i] + " não existe");
+                        Console.WriteLine("\n****************\n");
+                        Console.ReadLine();
+                        Environment.Exit(0);
+                    }
+
+                    if (Regex.IsMatch(instrucao[i], @"A")) {
+                        instrucao[i] = "0";
+                    }
+                    if (Regex.IsMatch(instrucao[i], @"B")) {
+                        instrucao[i] = "1";
+                    }
+                    if (Regex.IsMatch(instrucao[i], @"C")) {
+                        instrucao[i] = "2";
+                    }
+                    if (Regex.IsMatch(instrucao[i], @"D")) {
+                        instrucao[i] = "3";
+                    }
+                }
+            }
+        }
     }
 }

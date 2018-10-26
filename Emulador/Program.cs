@@ -17,6 +17,7 @@ namespace Emulador {
             
 
             Encoder.insereValorDeInstrucao(listaInstrucoes);
+            Encoder.codificaRegistradores(listaInstrucoes);
 
             Console.WriteLine("\n\n");
             j = 0;

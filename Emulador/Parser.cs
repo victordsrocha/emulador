@@ -53,108 +53,108 @@ namespace Emulador {
              */
 
             //instrução de código 1
-            if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(add)\s+([A-Z]),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(add)\s+([A-Z]),\s+(\d+|-\d+)");
             }
             //instrução de código 2
-            if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(add)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(add)\s+([A-Z]),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(add)\s+([A-Z]),\s+([A-Z])");
             }
             //instrução de código 3
-            if (Regex.IsMatch(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(add)\s+(0x[A-F0-9]+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(add)\s+(0x[A-F0-9]+),\s+([A-Z])");
             }
             //instrução de código 4
             if (Regex.IsMatch(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
                 return Regex.Match(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)");
             }
             //instrução de código 5
-            if (Regex.IsMatch(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(mov)\s+([A-Z]),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(mov)\s+([A-Z]),\s+(\d+|-\d+)");
             }
             //instrução de código 6
-            if (Regex.IsMatch(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(mov)\s+([A-Z]),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(mov)\s+([A-Z]),\s+([A-Z])");
             }
             //instrução de código 7
-            if (Regex.IsMatch(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+([A-Z])");
             }
             //instrução de código 8
             if (Regex.IsMatch(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
                 return Regex.Match(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)");
             }
             //instrução de código 9
-            if (Regex.IsMatch(fonte, @"(inc)\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(inc)\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(inc)\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(inc)\s+([A-Z])");
             }
             //instrução de código 10
             if (Regex.IsMatch(fonte, @"(inc)\s+(0x[A-F0-9]+)")) {
                 return Regex.Match(fonte, @"(inc)\s+(0x[A-F0-9]+)");
             }
             //instrução de código 11
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+([A-Z])");
             }
             //instrução de código 13
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+([A-Z])");
             }
             //instrução de código 15
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+([A-Z])");
             }
             //instrução de código 17
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 18
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+(0x[A-F0-9]+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 19
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 20
-            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+([A-Z])");
             }
             //instrução de código 22
-            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+([A-Z])");
             }
             //instrução de código 24
-            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])");
+            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+([A-Z])")) {
+                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+([A-Z])");
             }
             //instrução de código 26
             if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)")) {
                 return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 27
-            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+(0x[A-F0-9]+)")) {
+                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 28
             if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)")) {
                 return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)");
             }
             //instrução de código 12
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+([A-Z]),\s+(\d+|-\d+)");
             }
             //instrução de código 14
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(\d+|-\d+),\s+(\d+|-\d+)");
             }
             //instrução de código 16
-            if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(imul)\s+([A-Z]),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)");
             }
             //instrução de código 21
-            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(\d+|-\d+)");
+            if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+(\d+|-\d+)")) {
+                return Regex.Match(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+([A-Z]),\s+(\d+|-\d+)");
             }
             //instrução de código 23
             if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(\d+|-\d+)")) {
