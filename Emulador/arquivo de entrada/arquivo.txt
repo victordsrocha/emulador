@@ -1,0 +1,7 @@
+mov A, 2
+mov B, 3
+add A, B
+mov 0x0001, A
+inc 0x0001
+imul C, 0x0001, 4
+mov 0x0002, C
