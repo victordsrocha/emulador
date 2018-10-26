@@ -150,6 +150,7 @@ namespace Emulador {
                         Console.WriteLine("\n***** ERRO *****\n");
                         Console.WriteLine("Registrador " + instrucao[i] + " não existe");
                         Console.WriteLine("\n****************\n");
+
                         Console.ReadLine();
                         Environment.Exit(0);
                     }
@@ -168,6 +169,71 @@ namespace Emulador {
                     }
                 }
             }
+        }
+
+        public static int hexaEndParaDecInt(string hexa) {
+            /* Recebe um string de endereço do tipo 0x00...0FF
+             * Elimina os caracteres '0x' do inicio
+             * Converte valor hexadecimal do endereço para decimal
+             * retorna o decimal (inteiro)
+             * 
+             * Por enquanto é usado somente dentro de codificaEnderecos, posteriormente
+             * poderia ser enviado para codificaEnderecos como função local
+             */
+
+            var dic = new Dictionary<char, int>();
+            dic.Add('0', 0);
+            dic.Add('1', 1);
+            dic.Add('2', 2);
+            dic.Add('3', 3);
+            dic.Add('4', 4);
+            dic.Add('5', 5);
+            dic.Add('6', 6);
+            dic.Add('7', 7);
+            dic.Add('8', 8);
+            dic.Add('9', 9);
+            dic.Add('A', 10);
+            dic.Add('B', 11);
+            dic.Add('C', 12);
+            dic.Add('D', 13);
+            dic.Add('E', 14);
+            dic.Add('F', 15);
+            dic.Add('a', 10);
+            dic.Add('b', 11);
+            dic.Add('c', 12);
+            dic.Add('d', 13);
+            dic.Add('e', 14);
+            dic.Add('f', 15);
+
+            //remove dois primeiros caracteres do endereço
+            hexa = hexa.Remove(0, 2);
+
+            //converte para inteiro decimal
+            int valor = 0;
+            for (int i = 0; i < hexa.Length; i++) {
+                valor += (int)(Math.Pow(16, i)) * dic[hexa[hexa.Length - (i + 1)]];
+            }
+            return valor;
+        }
+
+        public static void codificaEnderecos(List<List<string>> entradas) {
+            /* Altera todos os endereços do tipo 0x...FF em entradas para o inteiro decimal
+             * correspondente. O valor decimal será armazenado como string em entradas
+             */
+
+            foreach (var instrucao in entradas) {
+
+                for (int i = 1; i < instrucao.Count; i++) {
+
+                    if (Regex.IsMatch(instrucao[i], @"(0x[A-F0-9]+)")) {
+
+                        int end = hexaEndParaDecInt(instrucao[i]);
+                        instrucao[i] = Convert.ToString(end);
+                    }
+                    
+                }
+            }
+
         }
     }
 }
