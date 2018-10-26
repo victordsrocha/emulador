@@ -24,12 +24,34 @@ namespace Emulador {
             transformar inteiros em bytes deve ser feito somente do encoder!
         */
 
-        public static Match executarParser(string fonte) {
-           /* Recebe uma string e retorna um objeto do tipo Match caso a string seja uma instrução bem formada
-            * Para acessar os grupos de captura:
-            * string contida no grupo x vai estar em Match.Groups[x].Value
-            */
-            
+        
+
+        public static List<string> separaGrupos(string fonte) {
+            /*
+             * Recebe um string e verifica sintaxa executando verificaSintaxe()
+             * verificaSintaxe() transforma string de entrada em tipo Match
+             * separaGrupos retorna uma lista na qual a posição x contem o valor
+             * (string) do grupo x (do Match)
+             */
+
+            Match instrucao = verificaSintaxe(fonte);
+
+            var grupos = new List<string>();
+            for (int i = 0; i < instrucao.Groups.Count; i++) {
+                grupos.Add(instrucao.Groups[i].Value);
+            }
+
+            return grupos;
+        }
+
+
+
+        public static Match verificaSintaxe(string fonte) {
+            /* Recebe uma string e retorna um objeto do tipo Match caso a string seja uma instrução bem formada
+             * Para acessar os grupos de captura:
+             * string contida no grupo x vai estar em Match.Groups[x].Value
+             */
+
             //instrução de código 1
             if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
                 return Regex.Match(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)");
