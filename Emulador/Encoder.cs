@@ -224,6 +224,9 @@ namespace Emulador {
         public static void codificaEnderecos(List<List<dynamic>> entradas) {
             /* Altera todos os endereços do tipo 0x...FF em entradas para o inteiro decimal
              * correspondente. O valor decimal será armazenado como string em entradas
+             * 
+             * Os dados de endereços serão armazenados ocupando 'palavras', ainda que a
+             * largura do barramento de endereços seja menor que a palavra
              */
 
             foreach (var instrucao in entradas) {
@@ -234,7 +237,7 @@ namespace Emulador {
                         if (Regex.IsMatch(textoItemInstrucao, @"(0x[A-F0-9]+)")) {
 
                             long end = hexaEndParaDecInt(instrucao[i]);
-                            instrucao[i] = intToVetorByte(end, Constantes.larguraBarramentoDeEndereco);
+                            instrucao[i] = intToVetorByte(end, Constantes.tamanhoPalavra);
                         }
                     }
                     catch {
@@ -275,6 +278,22 @@ namespace Emulador {
                  */
                 int[] vetorByte = new int[Constantes.tamanhoPalavra];
 
+
+                //Teste overflow!
+                long maiorLiteral = (long)Math.Pow(2, (Constantes.tamanhoPalavra * 8) - 1) - 1;
+                if(literal>maiorLiteral || literal < ((maiorLiteral * -1) - 1)) {
+                    Console.WriteLine("\n***** ERRO *****\n");
+                    Console.WriteLine("literal fora do intervalo");
+                    Console.WriteLine("Literal: " + literal);
+                    Console.WriteLine("Intervalo permitido para tamanho de palavra = " +
+                        Constantes.tamanhoPalavra * 8 + " bits:");
+                    Console.WriteLine(maiorLiteral * (-1) - 1 + " até " + maiorLiteral);
+                    Console.WriteLine("\n****************\n");
+
+                    Console.ReadLine();
+                    Environment.Exit(0);
+                }
+
                 if (literal >= 0) {
                     for (int i = Constantes.tamanhoPalavra - 1; i >= 0; i--) {
                         vetorByte[i] = (int)(literal % 256);
@@ -284,7 +303,6 @@ namespace Emulador {
                 }
                 else {
                     //maior literal possível levando em conta que metade do intervalo é negativo
-                    long maiorLiteral = (long)Math.Pow(2, (Constantes.tamanhoPalavra * 8) - 1) - 1;
                     Console.WriteLine("literal capturado: " + literal);
                     Console.WriteLine("maiorLiteral = " + maiorLiteral);
                     literal *= -1;

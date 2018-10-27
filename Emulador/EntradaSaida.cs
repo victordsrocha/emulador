@@ -37,7 +37,7 @@ namespace Emulador {
 
                             Console.ReadLine();
                             Environment.Exit(0);
-                            
+
                         }
                     }
                 }
@@ -45,19 +45,60 @@ namespace Emulador {
         }
 
         public void imprimeBuffer() {
+            int contador = -1;
+            int qtdColor = 0;
+            bool maisInstrucoes = true;
 
-            string s = "[";
+            Console.WriteLine("Buffer " + Constantes.tamanhoBuffer + " bytes");
+
+            Console.Write("[ ");
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
             for (int i = 0; i < buffer.Length; i++) {
-                if (i != buffer.Length - 1) {
-                    s += +buffer[i] + ",";
+
+                contador++;
+                if (contador == 0 && maisInstrucoes) {
+                    int codigo = buffer[i + Constantes.tamanhoPalavra - 1];
+                    qtdColor = tamanhoInstrucao(codigo) * Constantes.tamanhoPalavra;
+                    mudaCorBackground();
+                    if (qtdColor == 0) {
+                        maisInstrucoes = false;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
                 }
-                else {
-                    s += +buffer[i];
+                if (contador == qtdColor - 1) {
+                    contador = -1;
+                }
+
+
+                Console.Write(buffer[i] + " ");
+
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("]");
+
+
+            void mudaCorBackground() {
+                if (Console.BackgroundColor == ConsoleColor.DarkGray) {
+                    Console.BackgroundColor = ConsoleColor.DarkBlue;
+                }
+                else if (Console.BackgroundColor == ConsoleColor.DarkBlue) {
+                    Console.BackgroundColor = ConsoleColor.DarkGray;
                 }
             }
-            s += "]";
-            Console.WriteLine(s);
 
+        }
+
+        public int tamanhoInstrucao(int codigo) {
+            if (codigo >=1 && codigo < 9) {
+                return 3;
+            }
+            if (codigo >= 9 && codigo < 11) {
+                return 2;
+            }
+            if (codigo >= 11) {
+                return 4;
+            }
+            return 0;
         }
 
         public List<List<dynamic>> executarParser() {
