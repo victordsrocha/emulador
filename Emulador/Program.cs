@@ -4,56 +4,21 @@ using System.Collections.Generic;
 namespace Emulador {
 
     static class Constantes {
-        public const int tamanhoPalavra = 32 / 8;
+        public const int tamanhoPalavra = 32 / 8; //Tamanho da palavra em bits [16, 32 ou 64]
         public const int larguraBarramentoDeDados = 16 / 8;
-        public const int larguraBarramentoDeEndereco = 8 / 8;
+        public const int larguraBarramentoDeEndereco = 8 / 8; //Largura do barramento em bits [8, 16 ou 32]
+        public const int tamanhoBuffer = 256; //Tamanho do buffer de entrada/saída em bytes [64, 128 ou 256]
+        //Tamanho da RAM em bytes [128, 256 ou 512]
     }
 
     class Program {
         static void Main(string[] args) {
 
-            var ES = new EntradaSaida();
-            var listaInstrucoes = ES.executarParser();
+            var moduloES = new EntradaSaida();
 
-            int j = 0;
-            foreach (var item in listaInstrucoes) {
-                for (int i = 0; i < listaInstrucoes[j].Count; i++) {
-                    Console.WriteLine("Linha " + j + " ,Grupo " + i + ": " + listaInstrucoes[j][i]);
-                }
-                j++;
-            }
+            moduloES.preencheBuffer();
 
-            Encoder.codificaLiteraisEmByteArray(listaInstrucoes);
-            Encoder.insereValorDeInstrucao(listaInstrucoes);
-            Encoder.codificaEnderecos(listaInstrucoes);
-            Encoder.codificaRegistradores(listaInstrucoes);
-            
-
-            Console.WriteLine("\n\n");
-            j = 0;
-            foreach (var item in listaInstrucoes) {
-                for (int i = 0; i < listaInstrucoes[j].Count; i++) {
-                    Console.WriteLine("Linha " + j + " ,Grupo " + i + ": " + listaInstrucoes[j][i]);
-                }
-                j++;
-            }
-
-            string nome = "victor";
-
-            Console.WriteLine("\n\n");
-            for (int i = 0; i < nome.Length; i++) {
-                Console.WriteLine("Caractere de posição " + i + ": " + nome[i]);
-            }
-
-            nome = nome.Remove(0, 2);
-
-            Console.WriteLine("\n\n");
-            for (int i = 0; i < nome.Length; i++) {
-                Console.WriteLine("Caractere de posição " + i + ": " + nome[i]);
-            }
-
-            Console.WriteLine("\n\nTeste: 0x00F4A = " + Encoder.hexaEndParaDecInt("0x00F4A"));
-
+            moduloES.imprimeBuffer();
 
             
 

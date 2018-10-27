@@ -6,6 +6,60 @@ using System.IO;
 namespace Emulador {
     class EntradaSaida {
 
+        public int[] buffer;
+
+        public EntradaSaida() {
+            this.buffer = new int[Constantes.tamanhoBuffer];
+        }
+
+        public void preencheBuffer() {
+
+            var entradas = this.executarParser();
+
+            Encoder.codificaLiteraisEmByteArray(entradas);
+            Encoder.insereValorDeInstrucao(entradas);
+            Encoder.codificaEnderecos(entradas);
+            Encoder.codificaRegistradores(entradas);
+
+            int contador = 0;
+            foreach (var linha in entradas) {
+                for (int i = 1; i < linha.Count; i++) {
+                    auxiliar.VetorByte vetorByte = linha[i];
+                    for (int j = 0; j < vetorByte.vetor.Length; j++) {
+                        try {
+                            this.buffer[contador] = vetorByte.vetor[j];
+                            contador++;
+                        }
+                        catch {
+                            Console.WriteLine("\n***** ERRO *****\n");
+                            Console.WriteLine("Buffer não é grande o bastante para a lista de instruções");
+                            Console.WriteLine("\n****************\n");
+
+                            Console.ReadLine();
+                            Environment.Exit(0);
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        public void imprimeBuffer() {
+
+            string s = "[";
+            for (int i = 0; i < buffer.Length; i++) {
+                if (i != buffer.Length - 1) {
+                    s += +buffer[i] + ",";
+                }
+                else {
+                    s += +buffer[i];
+                }
+            }
+            s += "]";
+            Console.WriteLine(s);
+
+        }
+
         public List<List<dynamic>> executarParser() {
             // listaEntradas é lista contendo linhas do arquivo
             var listaEntradas = lerArquivoDeEntrada();
