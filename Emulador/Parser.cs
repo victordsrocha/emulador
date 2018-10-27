@@ -26,7 +26,7 @@ namespace Emulador {
 
         
 
-        public static List<string> separaGrupos(string fonte) {
+        public static List<dynamic> separaGrupos(string fonte) {
             /*
              * Recebe um string e verifica sintaxa executando verificaSintaxe()
              * verificaSintaxe() transforma string de entrada em tipo Match
@@ -36,7 +36,7 @@ namespace Emulador {
 
             Match instrucao = verificaSintaxe(fonte);
 
-            var grupos = new List<string>();
+            var grupos = new List<dynamic>();
             for (int i = 0; i < instrucao.Groups.Count; i++) {
                 grupos.Add(instrucao.Groups[i].Value);
             }

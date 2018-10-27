@@ -6,11 +6,11 @@ using System.IO;
 namespace Emulador {
     class EntradaSaida {
 
-        public List<List<string>> executarParser() {
+        public List<List<dynamic>> executarParser() {
             // listaEntradas é lista contendo linhas do arquivo
             var listaEntradas = lerArquivoDeEntrada();
             // é criada uma lista para armazenar as listas de grupos para cada instrução do arquivo
-            var listaDeListaDeGrupoDeInstrucaoParseada = new List<List<string>>();
+            var listaDeListaDeGrupoDeInstrucaoParseada = new List<List<dynamic>>();
             // as linhas do arquivo são verificadas e separadas em grupos pelos métodos do parser
             foreach (var instrucao in listaEntradas) {
                 listaDeListaDeGrupoDeInstrucaoParseada.Add(Parser.separaGrupos(instrucao));

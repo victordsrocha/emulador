@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace Emulador {
     static class Encoder {
 
-        public static void insereValorDeInstrucao(List<List<string>> entradas) {
+        public static void insereValorDeInstrucao(List<List<dynamic>> entradas) {
             /* Esta função modifica a lista contendo instruções!
              * 
              * O grupo um  (contendo nome da instrução :mov, add, inc ou imul) será substuido por um 
@@ -26,152 +26,157 @@ namespace Emulador {
             }
 
             void insereCodigoEmGrupoUm() {
+                //instrução de código 1
                 if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "1";
+                    entradas[linha][1] = intToVetorByte(1,Constantes.tamanhoPalavra);
                 }
                 //instrução de código 2
                 if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "2";
+                    entradas[linha][1] = intToVetorByte(2, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 3
                 if (Regex.IsMatch(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "3";
+                    entradas[linha][1] = intToVetorByte(3, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 4
                 if (Regex.IsMatch(fonte, @"(add)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "4";
+                    entradas[linha][1] = intToVetorByte(4, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 5
                 if (Regex.IsMatch(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "5";
+                    entradas[linha][1] = intToVetorByte(5, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 6
                 if (Regex.IsMatch(fonte, @"(mov)\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "6";
+                    entradas[linha][1] = intToVetorByte(6, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 7
                 if (Regex.IsMatch(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "7";
+                    entradas[linha][1] = intToVetorByte(7, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 8
                 if (Regex.IsMatch(fonte, @"(mov)\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "8";
+                    entradas[linha][1] = intToVetorByte(8, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 9
                 if (Regex.IsMatch(fonte, @"(inc)\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "9";
+                    entradas[linha][1] = intToVetorByte(9, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 10
                 if (Regex.IsMatch(fonte, @"(inc)\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "10";
+                    entradas[linha][1] = intToVetorByte(10, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 11
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "11";
+                    entradas[linha][1] = intToVetorByte(11, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 13
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "13";
+                    entradas[linha][1] = intToVetorByte(13, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 15
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "15";
+                    entradas[linha][1] = intToVetorByte(15, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 17
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "17";
+                    entradas[linha][1] = intToVetorByte(17, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 18
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "18";
+                    entradas[linha][1] = intToVetorByte(18, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 19
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "19";
+                    entradas[linha][1] = intToVetorByte(19, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 20
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "20";
+                    entradas[linha][1] = intToVetorByte(20, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 22
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "22";
+                    entradas[linha][1] = intToVetorByte(22, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 24
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(Pi|[A-Z])")) {
-                    entradas[linha][1] = "24";
+                    entradas[linha][1] = intToVetorByte(24, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 26
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "26";
+                    entradas[linha][1] = intToVetorByte(26, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 27
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "27";
+                    entradas[linha][1] = intToVetorByte(27, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 28
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(0x[A-F0-9]+)")) {
-                    entradas[linha][1] = "28";
+                    entradas[linha][1] = intToVetorByte(28, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 12
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "12";
+                    entradas[linha][1] = intToVetorByte(12, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 14
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(\d+|-\d+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "14";
+                    entradas[linha][1] = intToVetorByte(14, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 16
                 if (Regex.IsMatch(fonte, @"(imul)\s+(Pi|[A-Z]),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "16";
+                    entradas[linha][1] = intToVetorByte(16, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 21
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "21";
+                    entradas[linha][1] = intToVetorByte(21, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 23
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(\d+|-\d+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "23";
+                    entradas[linha][1] = intToVetorByte(23, Constantes.tamanhoPalavra);
                 }
                 //instrução de código 25
                 if (Regex.IsMatch(fonte, @"(imul)\s+(0x[A-F0-9]+),\s+(0x[A-F0-9]+),\s+(\d+|-\d+)")) {
-                    entradas[linha][1] = "25";
+                    entradas[linha][1] = intToVetorByte(25, Constantes.tamanhoPalavra);
                 }
             }
         }
 
-        public static void codificaRegistradores(List<List<string>> entradas) {
+        public static void codificaRegistradores(List<List<dynamic>> entradas) {
 
             foreach (var instrucao in entradas) {
 
                 for (int i = 1; i < instrucao.Count; i++) {
+                    try {
+                        string textoItemInstrucao = (string)instrucao[i];
+                        if (Regex.IsMatch(textoItemInstrucao, @"([E-Z])")) {
+                            Console.WriteLine("\n***** ERRO *****\n");
+                            Console.WriteLine("Registrador " + instrucao[i] + " não existe");
+                            Console.WriteLine("\n****************\n");
 
-                    if (Regex.IsMatch(instrucao[i], @"([E-Z])")) {
-                        Console.WriteLine("\n***** ERRO *****\n");
-                        Console.WriteLine("Registrador " + instrucao[i] + " não existe");
-                        Console.WriteLine("\n****************\n");
+                            Console.ReadLine();
+                            Environment.Exit(0);
+                        }
 
-                        Console.ReadLine();
-                        Environment.Exit(0);
+                        if (Regex.IsMatch(textoItemInstrucao, @"A")) {
+                            instrucao[i] = intToVetorByte(0,Constantes.tamanhoPalavra);
+                        }
+                        if (Regex.IsMatch(textoItemInstrucao, @"B")) {
+                            instrucao[i] = intToVetorByte(1, Constantes.tamanhoPalavra);
+                        }
+                        if (Regex.IsMatch(textoItemInstrucao, @"C")) {
+                            instrucao[i] = intToVetorByte(2, Constantes.tamanhoPalavra);
+                        }
+                        if (Regex.IsMatch(textoItemInstrucao, @"D")) {
+                            instrucao[i] = intToVetorByte(3, Constantes.tamanhoPalavra);
+                        }
                     }
-
-                    if (Regex.IsMatch(instrucao[i], @"A")) {
-                        instrucao[i] = "0";
-                    }
-                    if (Regex.IsMatch(instrucao[i], @"B")) {
-                        instrucao[i] = "1";
-                    }
-                    if (Regex.IsMatch(instrucao[i], @"C")) {
-                        instrucao[i] = "2";
-                    }
-                    if (Regex.IsMatch(instrucao[i], @"D")) {
-                        instrucao[i] = "3";
+                    catch {
                     }
                 }
             }
         }
 
-        public static int hexaEndParaDecInt(string hexa) {
+        public static long hexaEndParaDecInt(string hexa) {
             /* Recebe um string de endereço do tipo 0x00...0FF
              * Elimina os caracteres '0x' do inicio
              * Converte valor hexadecimal do endereço para decimal
@@ -181,7 +186,7 @@ namespace Emulador {
              * poderia ser enviado para codificaEnderecos como função local
              */
 
-            var dic = new Dictionary<char, int>();
+            var dic = new Dictionary<char, long>();
             dic.Add('0', 0);
             dic.Add('1', 1);
             dic.Add('2', 2);
@@ -209,14 +214,14 @@ namespace Emulador {
             hexa = hexa.Remove(0, 2);
 
             //converte para inteiro decimal
-            int valor = 0;
+            long valor = 0;
             for (int i = 0; i < hexa.Length; i++) {
-                valor += (int)(Math.Pow(16, i)) * dic[hexa[hexa.Length - (i + 1)]];
+                valor += (long)(Math.Pow(16, i)) * dic[hexa[hexa.Length - (i + 1)]];
             }
             return valor;
         }
 
-        public static void codificaEnderecos(List<List<string>> entradas) {
+        public static void codificaEnderecos(List<List<dynamic>> entradas) {
             /* Altera todos os endereços do tipo 0x...FF em entradas para o inteiro decimal
              * correspondente. O valor decimal será armazenado como string em entradas
              */
@@ -224,16 +229,96 @@ namespace Emulador {
             foreach (var instrucao in entradas) {
 
                 for (int i = 1; i < instrucao.Count; i++) {
+                    try {
+                        string textoItemInstrucao = (string)instrucao[i];
+                        if (Regex.IsMatch(textoItemInstrucao, @"(0x[A-F0-9]+)")) {
 
-                    if (Regex.IsMatch(instrucao[i], @"(0x[A-F0-9]+)")) {
-
-                        int end = hexaEndParaDecInt(instrucao[i]);
-                        instrucao[i] = Convert.ToString(end);
+                            long end = hexaEndParaDecInt(instrucao[i]);
+                            instrucao[i] = intToVetorByte(end, Constantes.larguraBarramentoDeEndereco);
+                        }
                     }
-                    
+                    catch {
+                    }
                 }
             }
 
+        }
+
+        public static void codificaLiteraisEmByteArray(List<List<dynamic>> entradas) {
+
+            foreach (var instrucao in entradas) {
+                for (int i = 2; i < instrucao.Count; i++) {
+
+                    try {
+                        long inteiro = long.Parse(instrucao[i]);
+                        var vetorByte = new auxiliar.VetorByte(Constantes.tamanhoPalavra);
+                        vetorByte.vetor = literalByte(inteiro);
+                        instrucao[i] = vetorByte;
+                    }
+                    catch {
+                    }
+                }
+            }
+
+            int[] literalByte(long literal) {
+                /* Função interna de codificaLiteraisEmByteArray
+                 * Recebe um literal positivo ou negativo
+                 * retorna um array correspondente (com tamanho indicado pelo tamanho da palavra)
+                 * cada posição do array corresponde à uma base de 2^8 dado que um byte tem 8 bits
+                 * ex: array = [4,2,5] -> literal correspondente = 4 * (2^8)^2 + 2 * (2^8)^1 + 5 * (2^8)^0
+                 * os numeros negativos ocupam a metade superior desse array
+                 * ex: [128,0,0] -> literal correspondente = -1
+                 * como [128,255,255] é exatamente metade e [0,0,0] já contém o valor zero
+                 * então [128,0,0] contém -1
+                 * [128,0,1] contém -2
+                 * ...assim por diante
+                 */
+                int[] vetorByte = new int[Constantes.tamanhoPalavra];
+
+                if (literal >= 0) {
+                    for (int i = Constantes.tamanhoPalavra - 1; i >= 0; i--) {
+                        vetorByte[i] = (int)(literal % 256);
+                        literal = literal / 256;
+                    }
+                    return vetorByte;
+                }
+                else {
+                    //maior literal possível levando em conta que metade do intervalo é negativo
+                    long maiorLiteral = (long)Math.Pow(2, (Constantes.tamanhoPalavra * 8) - 1) - 1;
+                    Console.WriteLine("literal capturado: " + literal);
+                    Console.WriteLine("maiorLiteral = " + maiorLiteral);
+                    literal *= -1;
+                    literal += maiorLiteral;
+
+                    for (int i = Constantes.tamanhoPalavra - 1; i >= 0; i--) {
+                        vetorByte[i] = (int)(literal % 256);
+                        literal = literal / 256;
+                    }
+                    return vetorByte;
+                }
+
+            }
+
+        }
+
+        public static auxiliar.VetorByte intToVetorByte(int inteiro, int tamanho) {
+
+            var vetorByte = new auxiliar.VetorByte(tamanho);
+            for (int i = vetorByte.vetor.Length - 1; i >= 0; i--) {
+                vetorByte.vetor[i] = (int)(inteiro % 256);
+                inteiro = inteiro / 256;
+            }
+            return vetorByte;
+        }
+
+        public static auxiliar.VetorByte intToVetorByte(long inteiro64, int tamanho) {
+
+            var vetorByte = new auxiliar.VetorByte(tamanho);
+            for (int i = vetorByte.vetor.Length - 1; i >= 0; i--) {
+                vetorByte.vetor[i] = (int)(inteiro64 % 256);
+                inteiro64 = inteiro64 / 256;
+            }
+            return vetorByte;
         }
     }
 }

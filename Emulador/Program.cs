@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 
 namespace Emulador {
+
+    static class Constantes {
+        public const int tamanhoPalavra = 32 / 8;
+        public const int larguraBarramentoDeDados = 16 / 8;
+        public const int larguraBarramentoDeEndereco = 8 / 8;
+    }
+
     class Program {
         static void Main(string[] args) {
 
@@ -11,15 +18,16 @@ namespace Emulador {
             int j = 0;
             foreach (var item in listaInstrucoes) {
                 for (int i = 0; i < listaInstrucoes[j].Count; i++) {
-                    Console.WriteLine("Linha "+j +" ,Grupo " + i + ": " + listaInstrucoes[j][i]);
+                    Console.WriteLine("Linha " + j + " ,Grupo " + i + ": " + listaInstrucoes[j][i]);
                 }
                 j++;
             }
-            
 
+            Encoder.codificaLiteraisEmByteArray(listaInstrucoes);
             Encoder.insereValorDeInstrucao(listaInstrucoes);
-            Encoder.codificaRegistradores(listaInstrucoes);
             Encoder.codificaEnderecos(listaInstrucoes);
+            Encoder.codificaRegistradores(listaInstrucoes);
+            
 
             Console.WriteLine("\n\n");
             j = 0;
@@ -45,6 +53,10 @@ namespace Emulador {
             }
 
             Console.WriteLine("\n\nTeste: 0x00F4A = " + Encoder.hexaEndParaDecInt("0x00F4A"));
+
+
+            
+
 
             Console.ReadLine();
         }
