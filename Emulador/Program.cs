@@ -9,7 +9,7 @@ namespace Emulador {
         public const int larguraBarramentoDeEndereco = 8 / 8; //Largura do barramento em bits [8, 16 ou 32]
         public const int tamanhoBuffer = 128; //Tamanho do buffer de entrada/saída em bytes [64, 128 ou 256]
         public const int tamanhoRam = 128; //Tamanho da RAM em bytes [128, 256 ou 512]
-        public const int taxaDeTransferência = 20;
+        public const int taxaDeTransferência = 35;//bytes por segundo
     }
 
     class Program {
@@ -33,6 +33,10 @@ namespace Emulador {
 
             Console.WriteLine("\n\n");
             ram.imprimeMemoria();
+
+            Console.WriteLine("\n\n");
+            Console.WriteLine("Quantidade de bytes (em instruções inteiras) que cabem em uma rajada de "
+                + Constantes.taxaDeTransferência +" bytes: " + moduloES.QuantidadeBytesParaRajada());
 
             Console.ReadLine();
         }

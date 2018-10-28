@@ -93,7 +93,7 @@ namespace Emulador {
         }
 
         public int tamanhoInstrucao(int codigo) {
-            if (codigo >=1 && codigo < 9) {
+            if (codigo >= 1 && codigo < 9) {
                 return 3;
             }
             if (codigo >= 9 && codigo < 11) {
@@ -173,6 +173,24 @@ namespace Emulador {
             }
         }
 
+
+        public int QuantidadeBytesParaRajada() {
+            //analisa buffer e retorna quantidade de bytes que cabem na 'largura de banda' sem quebrar instruções!
+            //após a rajada será preciso fazer o "pop" de todos os dados já usados do buffer
+            //a função para isso já está pronta em auxiliar.auxiliar!
+
+            int posicao = 0;
+            int tamanhoAcumuladoEmBytes = 0;
+            while (true) {
+                posicao = (Constantes.tamanhoPalavra - 1) + tamanhoAcumuladoEmBytes;
+                if (tamanhoAcumuladoEmBytes + tamanhoInstrucao(buffer[posicao]) * Constantes.tamanhoPalavra <= Constantes.taxaDeTransferência) {
+                    tamanhoAcumuladoEmBytes += tamanhoInstrucao(buffer[posicao]) * Constantes.tamanhoPalavra;
+                }
+                else {
+                    return tamanhoAcumuladoEmBytes;
+                }
+            }
+        }
 
     }
 }
