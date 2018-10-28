@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Emulador.barramentos;
 
 namespace Emulador {
     class EntradaSaida {
 
+        public int localAtualBuffer;
+        public int localAtualRam;
         public int[] buffer;
 
         public EntradaSaida() {
             this.buffer = new int[Constantes.tamanhoBuffer];
+            localAtualBuffer = 0;
         }
 
         public void preencheBuffer() {
@@ -131,5 +135,44 @@ namespace Emulador {
                 return entradas;
             }
         }
+
+        public void carregaEnviaBarramentos(BarramentoDeDados barramentoDeDados,
+                                            BarramentoDeEnderecos barramentoDeEnderecos,
+                                            BarramentoDeControle barramentoDeControle,
+                                            Ram ram) {
+
+            enviaBarramentoDeControle();
+            enviaBarramentoDeEndereco();
+            enviaBarramentoDeDados();
+
+            void enviaBarramentoDeDados() {
+                //preenche barramento de dados
+                barramentoDeDados.receive(buffer, localAtualBuffer);
+                //atualiza local de memória utilizado do buffer
+                localAtualBuffer += barramentoDeDados.largura;
+
+                //envia conteúdo do barramento para a ram
+                barramentoDeDados.send(ram.memoria, localAtualRam);
+                //atualiza local de memória utilizado da ram
+                localAtualRam += barramentoDeDados.largura;
+            }
+
+            void enviaBarramentoDeEndereco() {
+                var endByte = Encoder.intToVetorByte(localAtualRam, Constantes.larguraBarramentoDeEndereco);
+                barramentoDeEnderecos.receive(endByte.vetor);
+
+                barramentoDeEnderecos.send(ram.vetorLeitorDeEndereco);
+                ram.leituraEndereco();
+            }
+
+            void enviaBarramentoDeControle() {
+                //Para o caso ES -> Ram o sinal de controle será sempre somente leitura (1)
+                barramentoDeControle.receive(1);
+                //Leva o sinal de controle e "armazena" na ram
+                barramentoDeControle.send(ram.ArmazenadorDeSinalDeControle);
+            }
+        }
+
+
     }
 }
