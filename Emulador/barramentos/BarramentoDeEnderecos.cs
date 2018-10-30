@@ -13,9 +13,16 @@ namespace Emulador.barramentos {
             }
         }
 
-        public void send(int[] vetor) {
+        public void send(Ram ram) {
             for (int i = 0; i < largura; i++) {
-                vetor[i] = fila.Dequeue();
+                ram.vetorLeitorDeEndereco[i] = fila.Dequeue();
+                ram.leituraEndereco();
+            }
+        }
+
+        public void send(CPU cpu) {
+            for (int i = 0; i < largura; i++) {
+                cpu.interrupcoes.Enqueue(this.fila.Dequeue());
             }
         }
     }

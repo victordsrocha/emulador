@@ -7,13 +7,13 @@ using Emulador.barramentos;
 namespace Emulador {
     class EntradaSaida {
 
-        public int localAtualBuffer;
         public int localAtualRam;
+        public int localAtualCPU;
         public int[] buffer;
 
         public EntradaSaida() {
             this.buffer = new int[Constantes.tamanhoBuffer];
-            localAtualBuffer = 0;
+            localAtualRam = 0;
         }
 
         public void preencheBuffer() {
@@ -62,7 +62,7 @@ namespace Emulador {
                 contador++;
                 if (contador == 0 && maisInstrucoes) {
                     int codigo = buffer[i + Constantes.tamanhoPalavra - 1];
-                    qtdColor = tamanhoInstrucao(codigo) * Constantes.tamanhoPalavra;
+                    qtdColor = tamanhoInstrucao(codigo);
                     mudaCorBackground();
                     if (qtdColor == 0) {
                         maisInstrucoes = false;
@@ -93,14 +93,93 @@ namespace Emulador {
         }
 
         public int tamanhoInstrucao(int codigo) {
-            if (codigo >= 1 && codigo < 9) {
-                return 3;
+            //retorna quantidade de bytes ocupada pela instrução na memória
+            int tp = Constantes.tamanhoPalavra;
+            int lb = Constantes.larguraBarramentoDeEndereco;
+
+            if (codigo == 1) {
+                return 3 * tp;
             }
-            if (codigo >= 9 && codigo < 11) {
-                return 2;
+            if (codigo == 2) {
+                return 3 * tp;
             }
-            if (codigo >= 11) {
-                return 4;
+            if (codigo == 3) {
+                return 2 * tp + lb;
+            }
+            if (codigo == 4) {
+                return 2 * tp + lb;
+            }
+            if (codigo == 5) {
+                return 3 * tp;
+            }
+            if (codigo == 6) {
+                return 3 * tp;
+            }
+            if (codigo == 7) {
+                return 2 * tp + lb;
+            }
+            if (codigo == 8) {
+                return 2 * tp + lb;
+            }
+            if (codigo == 9) {
+                return 2 * tp;
+            }
+            if (codigo == 10) {
+                return tp + lb;
+            }
+            if (codigo == 11) {
+                return 4 * tp;
+            }
+            if (codigo == 12) {
+                return 4 * tp;
+            }
+            if (codigo == 13) {
+                return 4 * tp;
+            }
+            if (codigo == 14) {
+                return 4 * tp;
+            }
+            if (codigo == 15) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 16) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 17) {
+                return 2 * tp + 2 * lb;
+            }
+            if (codigo == 18) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 19) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 20) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 21) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 22) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 23) {
+                return 3 * tp + lb;
+            }
+            if (codigo == 24) {
+                return 2 * tp + 2 * lb;
+            }
+            if (codigo == 25) {
+                return 2 * tp + 2 * lb;
+            }
+            if (codigo == 26) {
+                return tp + 3 * lb;
+            }
+            if (codigo == 27) {
+                return 2 * tp + 2 * lb;
+            }
+            if (codigo == 28) {
+                return 2 * tp + 2 * lb;
             }
             return 0;
         }
@@ -136,23 +215,58 @@ namespace Emulador {
             }
         }
 
-        public void carregaEnviaBarramentos(BarramentoDeDados barramentoDeDados,
+        public void rajada(BarramentoDeDados barramentoDeDados,
                                             BarramentoDeEnderecos barramentoDeEnderecos,
                                             BarramentoDeControle barramentoDeControle,
-                                            Ram ram) {
+                                            Ram ram,
+                                            CPU cpu) {
 
-            enviaBarramentoDeControle();
-            enviaBarramentoDeEndereco();
-            enviaBarramentoDeDados();
+
+            int numInstrucoesRajada = quantidadeInstrucoesParaRajada();
+            for (int i = 0; i < numInstrucoesRajada; i++) {
+                enviaEnderecoDeInterrupcao();
+                enviaTamanhoDeInterrupcao();
+                //numero de repeticoes que o barramento precisa para enviar a proxima instrução
+                if ((tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1]) % Constantes.larguraBarramentoDeDados) == 0) {
+                    int numEnvios = (tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1])) / Constantes.larguraBarramentoDeDados;
+                    for (int j = 0; j < numEnvios; j++) {
+                        enviaBarramentoDeControle();
+                        enviaBarramentoDeEndereco();
+                        enviaBarramentoDeDados();
+                        auxiliar.Auxiliar.popVetorLarguraDados(buffer);//fila do buffer anda uma largura de barramento de dados
+                    }
+                }
+                else {
+                    int tamanho = tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1]);
+                    int numEnviados = 0;
+                    int numEnvios = (tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1])) / Constantes.larguraBarramentoDeDados;
+                    for (int j = 0; j < numEnvios; j++) {
+                        enviaBarramentoDeControle();
+                        enviaBarramentoDeEndereco();
+                        enviaBarramentoDeDados();
+                        auxiliar.Auxiliar.popVetorLarguraDados(buffer);//fila do buffer anda uma largura de barramento de dados
+                        numEnviados += Constantes.larguraBarramentoDeDados;
+                    }
+                    
+                    while (tamanho - numEnviados != 0) {
+                        enviaBarramentoDeControle();
+                        enviaBarramentoDeEndereco();
+                        barramentoDeDados.receiveImpar(this);
+                        barramentoDeDados.send(ram);
+                        localAtualRam += 1;
+                        auxiliar.Auxiliar.popIndividial(buffer);
+                        numEnviados++;
+                    }
+                }
+                
+            }
 
             void enviaBarramentoDeDados() {
                 //preenche barramento de dados
-                barramentoDeDados.receive(buffer, localAtualBuffer);
-                //atualiza local de memória utilizado do buffer
-                localAtualBuffer += barramentoDeDados.largura;
+                barramentoDeDados.receive(this);
 
                 //envia conteúdo do barramento para a ram
-                barramentoDeDados.send(ram.memoria, localAtualRam);
+                barramentoDeDados.send(ram);
                 //atualiza local de memória utilizado da ram
                 localAtualRam += barramentoDeDados.largura;
             }
@@ -161,36 +275,77 @@ namespace Emulador {
                 var endByte = Encoder.intToVetorByte(localAtualRam, Constantes.larguraBarramentoDeEndereco);
                 barramentoDeEnderecos.receive(endByte.vetor);
 
-                barramentoDeEnderecos.send(ram.vetorLeitorDeEndereco);
-                ram.leituraEndereco();
+                barramentoDeEnderecos.send(ram);
+                
             }
 
             void enviaBarramentoDeControle() {
-                //Para o caso ES -> Ram o sinal de controle será sempre somente leitura (1)
-                barramentoDeControle.receive(1);
+                //Para o caso ES -> Ram o sinal de controle será sempre somente escrita (0)
+                barramentoDeControle.receive(0);
                 //Leva o sinal de controle e "armazena" na ram
-                barramentoDeControle.send(ram.ArmazenadorDeSinalDeControle);
+                barramentoDeControle.send(ram);
+            }
+
+            void enviaEnderecoDeInterrupcao() {
+                var vetorLocalRam = Encoder.intToVetorByte(localAtualRam, Constantes.larguraBarramentoDeEndereco);
+                barramentoDeEnderecos.receive(vetorLocalRam.vetor);
+                barramentoDeEnderecos.send(cpu);
+            }
+
+            void enviaTamanhoDeInterrupcao() {
+                int tamanho = tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1]);
+                var tamanhoInstrucaoVetorByte = Encoder.intToVetorByte(tamanho, Constantes.larguraBarramentoDeDados);
+                barramentoDeDados.receive(tamanhoInstrucaoVetorByte.vetor);
+                barramentoDeDados.send(cpu);
             }
         }
 
+        public int quantidadeInstrucoesParaRajada() {
+            //retorna o numero de instruções da rajada
+            int qtdBytes = 0;
 
-        public int QuantidadeBytesParaRajada() {
+            int qtdInst = 0;
+
+            while (qtdBytes <= quantidadeBytesParaRajada() * Constantes.larguraBarramentoDeDados) {
+                qtdBytes += tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1 + qtdBytes]);
+                if (qtdBytes <= quantidadeBytesParaRajada() * Constantes.larguraBarramentoDeDados) {
+                    qtdInst++;
+                }
+                else if(tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1 + qtdBytes]) == 0) {
+                    return qtdInst;
+                }
+                else {
+                    return qtdInst;
+                }
+            }
+            return 0;
+
+        }
+
+        public int quantidadeBytesParaRajada() {
             //analisa buffer e retorna quantidade de bytes que cabem na 'largura de banda' sem quebrar instruções!
             //após a rajada será preciso fazer o "pop" de todos os dados já usados do buffer
             //a função para isso já está pronta em auxiliar.auxiliar!
+
+            //atualizado para retornar o numero de barramentos que deverão ser preenchidos
 
             int posicao = 0;
             int tamanhoAcumuladoEmBytes = 0;
             while (true) {
                 posicao = (Constantes.tamanhoPalavra - 1) + tamanhoAcumuladoEmBytes;
-                if (tamanhoAcumuladoEmBytes + tamanhoInstrucao(buffer[posicao]) * Constantes.tamanhoPalavra <= Constantes.taxaDeTransferência) {
-                    tamanhoAcumuladoEmBytes += tamanhoInstrucao(buffer[posicao]) * Constantes.tamanhoPalavra;
+                if (tamanhoAcumuladoEmBytes + tamanhoInstrucao(buffer[posicao]) <= Constantes.taxaDeTransferência) {
+                    tamanhoAcumuladoEmBytes += tamanhoInstrucao(buffer[posicao]);
+                }
+                else if (tamanhoInstrucao(buffer[posicao])==0) {
+                    return (int)tamanhoAcumuladoEmBytes / Constantes.larguraBarramentoDeDados;
                 }
                 else {
-                    return tamanhoAcumuladoEmBytes;
+                    return (int)tamanhoAcumuladoEmBytes / Constantes.larguraBarramentoDeDados;
                 }
             }
         }
+
+
 
     }
 }

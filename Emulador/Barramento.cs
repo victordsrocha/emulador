@@ -14,7 +14,6 @@ namespace Emulador {
         }
 
         
-
         public void imprimeFila() {
             Console.Write("Barramento de dados\n[ ");
             foreach (var item in fila) {

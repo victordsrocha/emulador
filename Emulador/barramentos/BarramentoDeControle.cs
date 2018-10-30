@@ -11,8 +11,9 @@ namespace Emulador.barramentos {
             this.fila.Enqueue(sinalDeControle);
         }
 
-        public void send (int armazenadorSinalDeControle) {
-            armazenadorSinalDeControle = fila.Dequeue();
+        public void send (Ram ram) {
+            ram.ArmazenadorDeSinalDeControle = fila.Dequeue();
+            ram.leituraSinalDeControle();
         }
 
     }

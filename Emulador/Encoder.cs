@@ -237,7 +237,7 @@ namespace Emulador {
                         if (Regex.IsMatch(textoItemInstrucao, @"(0x[A-F0-9]+)")) {
 
                             long end = hexaEndParaDecInt(instrucao[i]);
-                            instrucao[i] = intToVetorByte(end, Constantes.tamanhoPalavra);
+                            instrucao[i] = intToVetorByte(end, Constantes.larguraBarramentoDeEndereco);
                         }
                     }
                     catch {
@@ -337,6 +337,60 @@ namespace Emulador {
                 inteiro64 = inteiro64 / 256;
             }
             return vetorByte;
+        }
+
+        public static int[] literalByte(long literal) {
+            /* Função interna de codificaLiteraisEmByteArray
+             * Recebe um literal positivo ou negativo
+             * retorna um array correspondente (com tamanho indicado pelo tamanho da palavra)
+             * cada posição do array corresponde à uma base de 2^8 dado que um byte tem 8 bits
+             * ex: array = [4,2,5] -> literal correspondente = 4 * (2^8)^2 + 2 * (2^8)^1 + 5 * (2^8)^0
+             * os numeros negativos ocupam a metade superior desse array
+             * ex: [128,0,0] -> literal correspondente = -1
+             * como [128,255,255] é exatamente metade e [0,0,0] já contém o valor zero
+             * então [128,0,0] contém -1
+             * [128,0,1] contém -2
+             * ...assim por diante
+             */
+            int[] vetorByte = new int[Constantes.tamanhoPalavra];
+
+
+            //Teste overflow!
+            long maiorLiteral = (long)Math.Pow(2, (Constantes.tamanhoPalavra * 8) - 1) - 1;
+            if (literal > maiorLiteral || literal < ((maiorLiteral * -1) - 1)) {
+                Console.WriteLine("\n***** ERRO *****\n");
+                Console.WriteLine("literal fora do intervalo");
+                Console.WriteLine("Literal: " + literal);
+                Console.WriteLine("Intervalo permitido para tamanho de palavra = " +
+                    Constantes.tamanhoPalavra * 8 + " bits:");
+                Console.WriteLine(maiorLiteral * (-1) - 1 + " até " + maiorLiteral);
+                Console.WriteLine("\n****************\n");
+
+                Console.ReadLine();
+                Environment.Exit(0);
+            }
+
+            if (literal >= 0) {
+                for (int i = Constantes.tamanhoPalavra - 1; i >= 0; i--) {
+                    vetorByte[i] = (int)(literal % 256);
+                    literal = literal / 256;
+                }
+                return vetorByte;
+            }
+            else {
+                //maior literal possível levando em conta que metade do intervalo é negativo
+                Console.WriteLine("literal capturado: " + literal);
+                Console.WriteLine("maiorLiteral = " + maiorLiteral);
+                literal *= -1;
+                literal += maiorLiteral;
+
+                for (int i = Constantes.tamanhoPalavra - 1; i >= 0; i--) {
+                    vetorByte[i] = (int)(literal % 256);
+                    literal = literal / 256;
+                }
+                return vetorByte;
+            }
+
         }
     }
 }
