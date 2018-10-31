@@ -303,8 +303,6 @@ namespace Emulador {
                 }
                 else {
                     //maior literal possível levando em conta que metade do intervalo é negativo
-                    Console.WriteLine("literal capturado: " + literal);
-                    Console.WriteLine("maiorLiteral = " + maiorLiteral);
                     literal *= -1;
                     literal += maiorLiteral;
 
@@ -379,8 +377,6 @@ namespace Emulador {
             }
             else {
                 //maior literal possível levando em conta que metade do intervalo é negativo
-                Console.WriteLine("literal capturado: " + literal);
-                Console.WriteLine("maiorLiteral = " + maiorLiteral);
                 literal *= -1;
                 literal += maiorLiteral;
 

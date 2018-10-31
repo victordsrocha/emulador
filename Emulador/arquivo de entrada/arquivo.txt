@@ -16,3 +16,4 @@ inc D
 inc D
 inc D
 inc D
+add D, -50

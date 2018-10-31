@@ -12,7 +12,11 @@ namespace Emulador {
         public const int tamanhoRam = 256; //Tamanho da RAM em bytes [128, 256 ou 512]
         public const int tamanhoOffset = taxaDeTransferência;//tamanho do offset em bytes
 
-        public const int taxaDeTransferência = 20;//bytes por segundo
+        public const int ciclosPorSegundo = 1;//somente para ajuste do timer
+        public const int transferênciasPorCiclo = 20;//Transferências de barramentos em cada ciclo
+
+
+        public const int taxaDeTransferência = larguraBarramentoDeDados * transferênciasPorCiclo;
 
 
         public const bool impressaoDeBarramentos = false;
@@ -138,7 +142,7 @@ namespace Emulador {
 
             void SetTimer() {
                 // Create a timer with a two second interval.
-                aTimer = new System.Timers.Timer(1000);
+                aTimer = new System.Timers.Timer(1000/Constantes.ciclosPorSegundo);
                 // Hook up the Elapsed event for the timer. 
                 aTimer.Elapsed += OnTimedEvent;
                 aTimer.AutoReset = true;
