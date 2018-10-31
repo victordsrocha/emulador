@@ -52,15 +52,12 @@ namespace Emulador.barramentos {
             }
         }
 
-        
-
-
-
         public void send(CPU cpu) {
             for (int i = 0; i < largura; i++) {
                 cpu.interrupcoes.Enqueue(this.fila.Dequeue());
             }
         }
+
 
     }
 }

@@ -14,11 +14,15 @@ namespace Emulador {
 
         public const int taxaDeTransferência = 20;//bytes por segundo
 
+
+        public const bool impressaoDeBarramentos = false;
+
     }
 
     class Program {
 
         private static System.Timers.Timer aTimer;
+        public static List<long> resultados = new List<long>();
 
         static void Main(string[] args) {
 
@@ -34,10 +38,16 @@ namespace Emulador {
             moduloES.preencheBuffer();
 
             Console.WriteLine("Digite 0 para usar o emulador no modo destaque de rajadas");
-            Console.WriteLine("Digite 1 para usar no modo timer");
-            int a = int.Parse(Console.ReadLine());
-            if (a == 0) {
+            Console.WriteLine("Digite 1 para usar no modo barramento");
+            Console.WriteLine("Digite 2 para usar no modo timer");
+            int c = int.Parse(Console.ReadLine());
+            if (c == 0) {
                 emuladorDestaqueRajadas();
+            }
+
+
+            if (c == 2) {
+                emuladorTimer();
             }
 
             void emuladorDestaqueRajadas() {
@@ -59,14 +69,17 @@ namespace Emulador {
                 }
             }
 
+            void emuladorTimer() {
+                Console.Clear();
+                mostrarDados();
+                SetTimer();
+                Console.Read();
+                aTimer.Stop();
+                aTimer.Dispose();
 
-
-
-
-
-
-
-
+                //Console.Clear();
+                //mostrarDados();
+            }
 
             void mostrarDados() {
                 //mostra buffer na tela
@@ -82,16 +95,18 @@ namespace Emulador {
 
                 //mostra lista atual de interrupções
                 cpu.imprimeInterrupcoes();
+
+                imprimirResultados();
             }
 
             void enviarRajada() {
-                Console.WriteLine("\n\nEnvio de rajada de buffer para ram e de interrupções de moduloES para cpu:");
                 moduloES.rajada(barramentoDeDados, barramentodeEnderecos, barramentoDeControle, ram, cpu);
             }
 
             void executarRajada() {
                 cpu.executaTodasInterrupcoes(moduloES, barramentoDeDados, barramentodeEnderecos,
                 barramentoDeControle, ram);
+                moduloES.ResultadoBuffer();
             }
 
             bool testeBufferVazio() {
@@ -105,41 +120,48 @@ namespace Emulador {
                 return true;
             }
 
+            void pulso() {
+                Console.Clear();
+                enviarRajada();
+                executarRajada();
+                mostrarDados();
+            }
 
-            
+            void OnTimedEvent(Object source, ElapsedEventArgs e) {
+                //Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",e.SignalTime);
+                
+                if (!testeBufferVazio()) {
+                    pulso();
+                }
+                
+            }
 
+            void SetTimer() {
+                // Create a timer with a two second interval.
+                aTimer = new System.Timers.Timer(1000);
+                // Hook up the Elapsed event for the timer. 
+                aTimer.Elapsed += OnTimedEvent;
+                aTimer.AutoReset = true;
+                aTimer.Enabled = true;
+            }
 
+            void imprimirResultados() {
+                Console.Write("output: ");
+                string s = "";
+                for (int i = 0; i < resultados.Count; i++) {
+                    s += "[" + resultados[resultados.Count - 1 - i] + "]";
+                }
+                resultados.Clear();
+                Console.WriteLine(s);
+            }
 
-
-            /*
-            SetTimer();
-
-            Console.WriteLine("\nPress the Enter key to exit the application...\n");
-            Console.WriteLine("The application started at {0:HH:mm:ss.fff}", DateTime.Now);
             Console.ReadLine();
-            aTimer.Stop();
-            aTimer.Dispose();
-
-            Console.WriteLine("Terminating the application...");
-            */
-
-            Console.ReadLine();
 
         }
 
-        private static void SetTimer() {
-            // Create a timer with a two second interval.
-            aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += OnTimedEvent;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
-        }
 
-        private static void OnTimedEvent(Object source, ElapsedEventArgs e) {
-            Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
-                              e.SignalTime);
-        }
+
+
 
     }
 }

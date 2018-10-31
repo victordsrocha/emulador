@@ -13,13 +13,13 @@ namespace Emulador {
             this.largura = largura;
         }
 
-        
         public void imprimeFila() {
-            Console.Write("Barramento de dados\n[ ");
+            string s = "[ ";
             foreach (var item in fila) {
-                Console.Write(item + " ");
+                s += item + " ";
             }
-            Console.WriteLine("]");
+            s += "]";
+            Console.WriteLine(s);
         }
 
     }

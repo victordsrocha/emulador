@@ -54,6 +54,7 @@ namespace Emulador {
         }
 
         public void imprimeInterrupcoes() {
+            Console.Write("Lista de interrupções no cpu: ");
             string s = "[ ";
             foreach (var item in interrupcoes) {
                 s += item + " ";
@@ -167,12 +168,12 @@ namespace Emulador {
 
             //executa instrução
             executaInstrucao(codigo, cache, barramentoDeDados, barramentoDeEnderecos,
-                barramentoDeControle, ram);
+                barramentoDeControle, ram, moduloES);
         }
 
         public void executaInstrucao(int codigo, int[] cache, BarramentoDeDados barramentoDeDados,
             BarramentoDeEnderecos barramentoDeEnderecos, BarramentoDeControle barramentoDeControle,
-            Ram ram) {
+            Ram ram, EntradaSaida ModuloES) {
 
             int tp = Constantes.tamanhoPalavra;
             int lb = Constantes.larguraBarramentoDeEndereco;
@@ -276,6 +277,17 @@ namespace Emulador {
                 return Decoder.byteToLongLiteral(vetorLiteral);
             }
 
+            void enviaResultadoParaBuffer(int[] resultado) {
+                for (int i = 0; i < resultado.Length/Constantes.larguraBarramentoDeDados; i++) {
+                    barramentoDeDados.receive(resultado);
+                    auxiliar.Auxiliar.popVetorLarguraDados(resultado);
+                    auxiliar.Auxiliar.insereZerosNoInicio(ModuloES.buffer, Constantes.larguraBarramentoDeDados);
+                    barramentoDeDados.send(ModuloES.buffer, 0);
+                }
+            }
+
+            int[] vetorResultado = new int[Constantes.tamanhoPalavra];
+
             //add R i
             if (codigo == 1) {
                 int codR = identificaCodigoRegistrador(1, 0);
@@ -284,6 +296,7 @@ namespace Emulador {
                 long soma = valorR + valorL;
                 int[] somaVetor = Encoder.literalByte(soma);
                 armazenaNoRegistrador(somaVetor, codR);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //add R R
             if (codigo == 2) {
@@ -294,6 +307,7 @@ namespace Emulador {
                 long soma = valorR1 + valorR2;
                 int[] somaVetor = Encoder.literalByte(soma);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //add e R
             if (codigo == 3) {
@@ -303,6 +317,7 @@ namespace Emulador {
                 long valorR1 = valorRegistrador(codR1);
                 long soma = valorE1 + valorR1;
                 escritaValorEndereco(soma, end1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //add e i
             if (codigo == 4) {
@@ -311,6 +326,7 @@ namespace Emulador {
                 long valorL1 = valorLiteral(1, 1);
                 long soma = valorE1 + valorL1;
                 escritaValorEndereco(soma, end1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //mov R i
             if (codigo == 5) {
@@ -319,6 +335,7 @@ namespace Emulador {
                 long soma = valorL;
                 int[] somaVetor = Encoder.literalByte(soma);
                 armazenaNoRegistrador(somaVetor, codR);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //mov R R
             if (codigo == 6) {
@@ -328,6 +345,7 @@ namespace Emulador {
                 long soma = valorR2;
                 int[] somaVetor = Encoder.literalByte(soma);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //mov e R
             if (codigo == 7) {
@@ -336,6 +354,7 @@ namespace Emulador {
                 long valorR1 = valorRegistrador(codR1);
                 long soma = valorR1;
                 escritaValorEndereco(soma, end1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //mov e i
             if (codigo == 8) {
@@ -343,6 +362,7 @@ namespace Emulador {
                 long valorL1 = valorLiteral(1, 1);
                 long soma = valorL1;
                 escritaValorEndereco(soma, end1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //inc R
             if (codigo == 9) {
@@ -351,6 +371,7 @@ namespace Emulador {
                 long soma = valorR + 1;
                 int[] somaVetor = Encoder.literalByte(soma);
                 armazenaNoRegistrador(somaVetor, codR);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //inc e
             if (codigo == 10) {
@@ -358,6 +379,7 @@ namespace Emulador {
                 long valorE1 = leituraValorEndereco(end1);
                 long soma = valorE1 + 1;
                 escritaValorEndereco(soma, end1);
+                vetorResultado = Encoder.literalByte(soma);
             }
             //imul R R R
             if (codigo == 11) {
@@ -369,6 +391,7 @@ namespace Emulador {
                 long mult = valorR2 * valorR3;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //imul R R i
             if (codigo == 12) {
@@ -381,6 +404,7 @@ namespace Emulador {
                 long mult = valorR2 * valorL1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R i R
             if (codigo == 13) {
@@ -393,6 +417,7 @@ namespace Emulador {
                 long mult = valorR2 * valorL1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R i i
             if (codigo == 14) {
@@ -406,6 +431,7 @@ namespace Emulador {
                 long mult = valorL2 * valorL1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R e R
             if (codigo == 15) {
@@ -421,6 +447,7 @@ namespace Emulador {
                 long mult = valorE1 * valorR2;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R e i
             if (codigo == 16) {
@@ -436,6 +463,7 @@ namespace Emulador {
                 long mult = valorE1 * valorL1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R e e
             if (codigo == 17) {
@@ -453,6 +481,7 @@ namespace Emulador {
                 long mult = valorE1 * valorE2;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R R e
             if (codigo == 18) {
@@ -470,6 +499,7 @@ namespace Emulador {
                 long mult = valorR2 * valorE1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //R i e
             if (codigo == 19) {
@@ -487,6 +517,7 @@ namespace Emulador {
                 long mult = valorL1 * valorE1;
                 int[] somaVetor = Encoder.literalByte(mult);
                 armazenaNoRegistrador(somaVetor, codR1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e R R
             if (codigo == 20) {
@@ -503,6 +534,7 @@ namespace Emulador {
 
                 long mult = valorR1 * valorR2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e R i
             if (codigo == 21) {
@@ -519,6 +551,7 @@ namespace Emulador {
 
                 long mult = valorR1 * valorL1;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e i R
             if (codigo == 22) {
@@ -535,6 +568,7 @@ namespace Emulador {
 
                 long mult = valorR1 * valorL1;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e i i
             if (codigo == 23) {
@@ -551,6 +585,7 @@ namespace Emulador {
 
                 long mult = valorL2 * valorL1;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e e R
             if (codigo == 24) {
@@ -567,6 +602,7 @@ namespace Emulador {
 
                 long mult = valorR1 * valorE2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e e i
             if (codigo == 25) {
@@ -583,6 +619,7 @@ namespace Emulador {
 
                 long mult = valorL1 * valorE2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e e e
             if (codigo == 26) {
@@ -601,6 +638,7 @@ namespace Emulador {
 
                 long mult = valorE3 * valorE2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e R e
             if (codigo == 27) {
@@ -619,6 +657,7 @@ namespace Emulador {
 
                 long mult = valorR1 * valorE2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
             //e i e
             if (codigo == 28) {
@@ -637,8 +676,9 @@ namespace Emulador {
 
                 long mult = valorL1 * valorE2;
                 escritaValorEndereco(mult, end1);
+                vetorResultado = Encoder.literalByte(mult);
             }
-
+            enviaResultadoParaBuffer(vetorResultado);
         }
 
     }

@@ -15,6 +15,15 @@ namespace Emulador.auxiliar {
             }
         }
 
+        public static void insereZerosNoInicio(int[] vetor, int qtdZeros) {
+            for (int i = 0; i < vetor.Length - qtdZeros; i++) {
+                vetor[vetor.Length - 1 - i] = vetor[vetor.Length - 1 - qtdZeros - i];
+            }
+            for (int i = 0; i < qtdZeros; i++) {
+                vetor[i] = 0;
+            }
+        }
+
         public static void popIndividial(int[] vetor) {
             //Faz a "fila" do buffer andar sempre que um byte é enviado para o barramento de dados
             for (int i = 0; i < 1; i++) {
@@ -115,6 +124,17 @@ namespace Emulador.auxiliar {
                 return 2 * tp + 2 * lb;
             }
             return 0;
+        }
+
+        public static void imprimeBarramentos(barramentos.BarramentoDeDados barramentoDeDados,
+            barramentos.BarramentoDeEnderecos barramentodeEnderecos,
+            barramentos.BarramentoDeControle barramentoDeControle) {
+            Console.WriteLine("Barramento de controle:");
+            barramentoDeControle.imprimeFila();
+            Console.WriteLine("Barramento de endereço:");
+            barramentodeEnderecos.imprimeFila();
+            Console.WriteLine("Barramento de dados:");
+            barramentoDeDados.imprimeFila();
         }
 
     }

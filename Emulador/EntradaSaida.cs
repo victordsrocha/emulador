@@ -8,12 +8,13 @@ namespace Emulador {
     class EntradaSaida {
 
         public int localAtualRam;
-        public int localAtualCPU;
+        public int resultadosEsperados;
         public int[] buffer;
 
         public EntradaSaida() {
             this.buffer = new int[Constantes.tamanhoBuffer];
             localAtualRam = 0;
+            resultadosEsperados = 0;
         }
 
         public void preencheBuffer() {
@@ -223,6 +224,7 @@ namespace Emulador {
 
             //reseta o local de gravaçcao na ram para zero
             localAtualRam = 0;
+            this.resultadosEsperados = quantidadeInstrucoesParaRajada();
 
             int numInstrucoesRajada = quantidadeInstrucoesParaRajada();
             for (int i = 0; i < numInstrucoesRajada; i++) {
@@ -299,6 +301,21 @@ namespace Emulador {
                 var tamanhoInstrucaoVetorByte = Encoder.intToVetorByte(tamanho, Constantes.larguraBarramentoDeDados);
                 barramentoDeDados.receive(tamanhoInstrucaoVetorByte.vetor);
                 barramentoDeDados.send(cpu);
+            }
+        }
+
+        public void ResultadoBuffer() {
+            for (int i = 0; i < resultadosEsperados; i++) {
+                int[] vetor = new int[Constantes.tamanhoPalavra];
+                for (int j = 0; j < vetor.Length; j++) {
+                    vetor[j] = buffer[j];
+                }
+                long resultado = Decoder.byteToLongLiteral(vetor);
+                Program.resultados.Add(resultado);
+                for (int j = 0; j < vetor.Length/Constantes.larguraBarramentoDeDados; j++) {
+                    auxiliar.Auxiliar.popVetorLarguraDados(this.buffer);
+                }
+                
             }
         }
 
