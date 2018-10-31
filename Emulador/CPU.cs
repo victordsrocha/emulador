@@ -18,7 +18,7 @@ namespace Emulador {
             B = new int[Constantes.tamanhoPalavra];
             C = new int[Constantes.tamanhoPalavra];
             D = new int[Constantes.tamanhoPalavra];
-            Pi = new int[Constantes.tamanhoPalavra];
+            Pi = new int[Constantes.larguraBarramentoDeEndereco];
             //o ideal é que as interrupcoes sejam estruturas contendo endereço e tamanho
             //this.interrupcoes = new int[(int)(Constantes.taxaDeTransferência / Constantes.tamanhoPalavra)];
             interrupcoes = new Queue<int>();
@@ -50,6 +50,12 @@ namespace Emulador {
                 s += D[i] + " ";
             }
             s += "] " + "(" + Decoder.byteToLongLiteral(D) + ")\n";
+            s += "Registrador Pi: ";
+            s += "[ ";
+            for (int i = 0; i < Constantes.tamanhoPalavra; i++) {
+                s += Pi[i] + " ";
+            }
+            s += "] " + "(" + Decoder.byteToLongLiteral(Pi) + ")\n";
             Console.WriteLine(s);
         }
 
@@ -112,8 +118,11 @@ namespace Emulador {
             barramentoDeControle.receive(1);
             barramentoDeControle.send(ram);
 
-            //altera 'ponteiro' da ram para endereço passado na interrupção
-            barramentoDeEnderecos.receive(endVetor);
+            //Armazena posição da instrução no registrador Pi
+            Pi = endVetor;
+
+            //altera 'ponteiro' da ram para endereço armazenado no registrador Pi
+            barramentoDeEnderecos.receive(Pi);
             barramentoDeEnderecos.send(ram);
 
             //instrução do endereço é armazenada no cpu
@@ -162,6 +171,8 @@ namespace Emulador {
                 Console.Write(cache[i]+" ");
             }
             */
+
+            
 
             //identifica código da instrução
             int codigo = cache[Constantes.tamanhoPalavra - 1];

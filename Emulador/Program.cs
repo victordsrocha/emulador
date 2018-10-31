@@ -13,7 +13,7 @@ namespace Emulador {
         public const int tamanhoOffset = taxaDeTransferência;//tamanho do offset em bytes
 
         public const int ciclosPorSegundo = 1;//somente para ajuste do timer
-        public const int transferênciasPorCiclo = 20;//Transferências de barramentos em cada ciclo
+        public const int transferênciasPorCiclo = 10;//Transferências de barramentos em cada ciclo
 
 
         public const int taxaDeTransferência = larguraBarramentoDeDados * transferênciasPorCiclo;
