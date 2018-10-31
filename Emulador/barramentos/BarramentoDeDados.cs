@@ -36,7 +36,8 @@ namespace Emulador.barramentos {
         }
 
         public void send(int[] vetorMemoria, int localMemoria) {
-            for (int i = 0; i < fila.Count; i++) {
+            int count = fila.Count;
+            for (int i = 0; i < count; i++) {
                 vetorMemoria[i + localMemoria] = fila.Dequeue();
             }
         }

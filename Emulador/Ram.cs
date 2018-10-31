@@ -44,47 +44,21 @@ namespace Emulador {
         }
 
         public void imprimeMemoriaRam() {
-            int contador = -1;
-            int qtdColor = 0;
-            bool maisInstrucoes = true;
-
-            Console.WriteLine("Ram " + Constantes.tamanhoRam + " bytes");
-
             Console.Write("[ ");
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            for (int i = 0; i < memoria.Length; i++) {
-
-                contador++;
-                if (contador == 0 && maisInstrucoes) {
-                    int codigo = memoria[i + Constantes.tamanhoPalavra - 1];
-                    qtdColor = auxiliar.Auxiliar.tamanhoInstrucao(codigo);
-                    mudaCorBackground();
-                    if (qtdColor == 0) {
-                        maisInstrucoes = false;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
-                }
-                if (contador == qtdColor - 1) {
-                    contador = -1;
-                }
-
-
-                Console.Write(memoria[i] + " ");
-
+            string s = "";
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            for (int i = 0; i < Constantes.taxaDeTransferência-1; i++) {
+                s += memoria[i] + " ";
             }
+            s += memoria[Constantes.taxaDeTransferência - 1];
+            Console.Write(s);
+            s = " ";
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write("]");
-
-
-            void mudaCorBackground() {
-                if (Console.BackgroundColor == ConsoleColor.DarkGray) {
-                    Console.BackgroundColor = ConsoleColor.DarkBlue;
-                }
-                else if (Console.BackgroundColor == ConsoleColor.DarkBlue) {
-                    Console.BackgroundColor = ConsoleColor.DarkGray;
-                }
+            for (int i = Constantes.taxaDeTransferência; i < this.memoria.Length; i++) {
+                s += memoria[i] + " ";
             }
-
+            s += "]";
+            Console.WriteLine(s);
         }
     }
 }

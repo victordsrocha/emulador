@@ -31,25 +31,25 @@ namespace Emulador {
             for (int i = 0; i < Constantes.tamanhoPalavra; i++) {
                 s += A[i] + " ";
             }
-            s += "]\n";
+            s += "] " + "(" + Decoder.byteToLongLiteral(A) + ")\n";
             s += "Registrador B: ";
             s += "[ ";
             for (int i = 0; i < Constantes.tamanhoPalavra; i++) {
                 s += B[i] + " ";
             }
-            s += "]\n";
+            s += "] " + "(" + Decoder.byteToLongLiteral(B) + ")\n";
             s += "Registrador C: ";
             s += "[ ";
             for (int i = 0; i < Constantes.tamanhoPalavra; i++) {
                 s += C[i] + " ";
             }
-            s += "]\n";
+            s += "] " + "(" + Decoder.byteToLongLiteral(C) + ")\n";
             s += "Registrador D: ";
             s += "[ ";
             for (int i = 0; i < Constantes.tamanhoPalavra; i++) {
                 s += D[i] + " ";
             }
-            s += "]\n";
+            s += "] " + "(" + Decoder.byteToLongLiteral(D) + ")\n";
             Console.WriteLine(s);
         }
 

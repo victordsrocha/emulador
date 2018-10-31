@@ -221,6 +221,8 @@ namespace Emulador {
                                             Ram ram,
                                             CPU cpu) {
 
+            //reseta o local de gravaçcao na ram para zero
+            localAtualRam = 0;
 
             int numInstrucoesRajada = quantidadeInstrucoesParaRajada();
             for (int i = 0; i < numInstrucoesRajada; i++) {
@@ -247,7 +249,7 @@ namespace Emulador {
                         auxiliar.Auxiliar.popVetorLarguraDados(buffer);//fila do buffer anda uma largura de barramento de dados
                         numEnviados += Constantes.larguraBarramentoDeDados;
                     }
-                    
+
                     while (tamanho - numEnviados != 0) {
                         enviaBarramentoDeControle();
                         enviaBarramentoDeEndereco();
@@ -258,7 +260,7 @@ namespace Emulador {
                         numEnviados++;
                     }
                 }
-                
+
             }
 
             void enviaBarramentoDeDados() {
@@ -276,7 +278,7 @@ namespace Emulador {
                 barramentoDeEnderecos.receive(endByte.vetor);
 
                 barramentoDeEnderecos.send(ram);
-                
+
             }
 
             void enviaBarramentoDeControle() {
@@ -303,23 +305,22 @@ namespace Emulador {
         public int quantidadeInstrucoesParaRajada() {
             //retorna o numero de instruções da rajada
             int qtdBytes = 0;
-
+            int quantidadeBytesRajada = quantidadeBytesParaRajada();
             int qtdInst = 0;
 
-            while (qtdBytes <= quantidadeBytesParaRajada() * Constantes.larguraBarramentoDeDados) {
+            while (qtdBytes <= quantidadeBytesRajada * Constantes.larguraBarramentoDeDados) {
                 qtdBytes += tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1 + qtdBytes]);
-                if (qtdBytes <= quantidadeBytesParaRajada() * Constantes.larguraBarramentoDeDados) {
+                if (qtdBytes <= quantidadeBytesRajada * Constantes.larguraBarramentoDeDados) {
                     qtdInst++;
-                }
-                else if(tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1 + qtdBytes]) == 0) {
-                    return qtdInst;
                 }
                 else {
                     return qtdInst;
                 }
+                if (tamanhoInstrucao(buffer[Constantes.tamanhoPalavra - 1 + qtdBytes]) == 0) {
+                    return qtdInst;
+                }
             }
             return 0;
-
         }
 
         public int quantidadeBytesParaRajada() {
@@ -336,15 +337,14 @@ namespace Emulador {
                 if (tamanhoAcumuladoEmBytes + tamanhoInstrucao(buffer[posicao]) <= Constantes.taxaDeTransferência) {
                     tamanhoAcumuladoEmBytes += tamanhoInstrucao(buffer[posicao]);
                 }
-                else if (tamanhoInstrucao(buffer[posicao])==0) {
+                else {
                     return (int)tamanhoAcumuladoEmBytes / Constantes.larguraBarramentoDeDados;
                 }
-                else {
+                if (tamanhoInstrucao(buffer[posicao]) == 0) {
                     return (int)tamanhoAcumuladoEmBytes / Constantes.larguraBarramentoDeDados;
                 }
             }
         }
-
 
 
     }
