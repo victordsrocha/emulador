@@ -8,7 +8,7 @@ namespace Emulador {
         public const int tamanhoPalavra = 16 / 8; //Tamanho da palavra em bits [16, 32 ou 64]
         public const int larguraBarramentoDeDados = 16 / 8;
         public const int larguraBarramentoDeEndereco = 16 / 8; //Largura do barramento em bits [8, 16 ou 32]
-        public const int tamanhoBuffer = 128; //Tamanho do buffer de entrada/saída em bytes [64, 128 ou 256]
+        public const int tamanhoBuffer = 256; //Tamanho do buffer de entrada/saída em bytes [64, 128 ou 256]
         public const int tamanhoRam = 256; //Tamanho da RAM em bytes [128, 256 ou 512]
         public const int tamanhoOffset = taxaDeTransferência;//tamanho do offset em bytes
 
@@ -19,7 +19,11 @@ namespace Emulador {
         public const int taxaDeTransferência = larguraBarramentoDeDados * transferênciasPorCiclo;
 
 
-        public const bool impressaoDeBarramentos = false;
+        public const int taxaDeAtualizacaoCacheParaRam = 4;
+        public const double porcentagemCache = 80;
+
+
+        //public const bool impressaoDeBarramentos = false;
 
     }
 
@@ -37,21 +41,46 @@ namespace Emulador {
             var barramentoDeControle = new barramentos.BarramentoDeControle(1);
             var barramentoDeDados = new barramentos.BarramentoDeDados(Constantes.larguraBarramentoDeDados);
             var barramentodeEnderecos = new barramentos.BarramentoDeEnderecos(Constantes.larguraBarramentoDeEndereco);
+            var cache = new Cache();
 
             //carrega buffer com dados de entrada
             moduloES.preencheBuffer();
 
             Console.WriteLine("Digite 0 para usar o emulador no modo destaque de rajadas");
-            Console.WriteLine("Digite 1 para usar no modo barramento");
-            Console.WriteLine("Digite 2 para usar no modo timer");
+            //Console.WriteLine("Digite 1 para usar no modo barramento");
+            Console.WriteLine("Digite 1 para usar no modo timer");
+            Console.WriteLine("Digite 2 para usar no modo destaque de memoria cache");
             int c = int.Parse(Console.ReadLine());
             if (c == 0) {
                 emuladorDestaqueRajadas();
             }
-
-
-            if (c == 2) {
+            if (c == 1) {
                 emuladorTimer();
+            }
+            if (c == 2)
+            {
+                emuladorDestaqueCache();
+            }
+
+            void emuladorDestaqueCache()
+            {
+                Console.Clear();
+                mostrarDadosComCache();
+                Console.Write("\nPressiona enter para enviar próxima rajada");
+                Console.ReadLine();
+                while (!testeBufferVazio())
+                {
+                    enviarRajada();
+                    Console.Clear();
+                    mostrarDadosComCache();
+                    Console.Write("\nPressiona enter para executar interrupções");
+                    Console.ReadLine();
+                    executarRajada();
+                    Console.Clear();
+                    mostrarDadosComCache();
+                    Console.Write("\nPressiona enter para enviar próxima rajada");
+                    Console.ReadLine();
+                }
             }
 
             void emuladorDestaqueRajadas() {
@@ -103,13 +132,36 @@ namespace Emulador {
                 imprimirResultados();
             }
 
+            void mostrarDadosComCache()
+            {
+                //mostra buffer na tela
+                moduloES.imprimeBuffer();
+
+                //mostram memoria principal na tela
+                Console.WriteLine("\n");
+                ram.imprimeMemoriaRam();
+
+                //mostra cache
+                Console.WriteLine("\n");
+                cache.imprimeCache();
+
+                Console.WriteLine();
+                //imprime registradores na tela
+                cpu.imprimeRegistradores();
+
+                //mostra lista atual de interrupções
+                cpu.imprimeInterrupcoes();
+
+                imprimirResultados();
+            }
+
             void enviarRajada() {
                 moduloES.rajada(barramentoDeDados, barramentodeEnderecos, barramentoDeControle, ram, cpu);
             }
 
             void executarRajada() {
                 cpu.executaTodasInterrupcoes(moduloES, barramentoDeDados, barramentodeEnderecos,
-                barramentoDeControle, ram);
+                barramentoDeControle, ram, cache);
                 moduloES.ResultadoBuffer();
             }
 

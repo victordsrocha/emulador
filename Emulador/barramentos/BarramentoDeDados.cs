@@ -30,6 +30,14 @@ namespace Emulador.barramentos {
             }
         }
 
+        public void receive(Cache cache, long posicao)
+        {
+            for (int i = 0; i < largura; i++)
+            {
+                fila.Enqueue(cache.vetor[i + posicao]);
+            }
+        }
+
         public void receiveImpar(Ram ram) {
             long posicao = ram.enderecoLido;
                 fila.Enqueue(ram.memoria[posicao]);

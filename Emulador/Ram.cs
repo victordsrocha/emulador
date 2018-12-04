@@ -44,7 +44,7 @@ namespace Emulador {
         }
 
         public void imprimeMemoriaRam() {
-            Console.Write("[ ");
+            Console.Write("Ram\n[ ");
             string s = "";
             Console.BackgroundColor = ConsoleColor.DarkRed;
             for (int i = 0; i < Constantes.taxaDeTransferência-1; i++) {
