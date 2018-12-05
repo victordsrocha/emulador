@@ -26,6 +26,18 @@ namespace Emulador {
             }
 
             void insereCodigoEmGrupoUm() {
+
+                //instrução de código 50
+                if (Regex.IsMatch(fonte, @"(lbl)\s+(\d+)"))
+                {
+                    entradas[linha][1] = intToVetorByte(50, Constantes.tamanhoPalavra);
+                }
+                //instrução de código 51
+                if(Regex.IsMatch(fonte, @"([A-Z])<(\d+)\s+:\s+jmp\s+(\d+)\s+:\s+brk"))
+                {
+                    entradas[linha][1] = intToVetorByte(51, Constantes.tamanhoPalavra);
+                }
+
                 //instrução de código 1
                 if (Regex.IsMatch(fonte, @"(add)\s+(Pi|[A-Z]),\s+(\d+|-\d+)")) {
                     entradas[linha][1] = intToVetorByte(1,Constantes.tamanhoPalavra);

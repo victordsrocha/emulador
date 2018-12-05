@@ -1,38 +1,51 @@
-mov A, 2
-mov B, 3
-add A, B
-mov 0x0001, A
-inc 0x0001
-imul C, 0x0001, 4
-mov 0x0002, C
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
-inc D
+-----------------
+TESTE DE LOOP
+
+lbl 1
+inc A
+add 0x03, 2
+add C, A
+A<100 : jmp 1 : brk
+
+-------------------
+TESTE DE ATUALIZACAO DA RAM
+EXECUTANDO A ENTRADA ABAIXO A CACHE ARMAZENA 35 E A RAM SOMENTE 20
+PARA CONSERTAR DEVE ADICIONAR UMA LINHA E ASSIM GARANTIR QUE O NUMERO DE ATUALIZAÇOES SERA MULTIPLO DA TAXA
+
+OU GARANTIR QUE NO FIM DO PROGRAMA A RAM SEJA ATUALIZADA
+
+add 0x03, 5
+add 0x03, 5
+add 0x03, 5
+add 0x03, 5
+add 0x03, 5
+add 0x03, 5
+add 0x03, 5
+
+-------------------
+TESTE DE SUBSTITUICAO
+
+MARCAR UM PONTO DE PARADA EM "encontrar blocos que tenham tamanho maior ou igual a instrução atual" E EXECUTAR O INPUT ABAIXO:
+
+=~ L 251 CPU
+
+lbl 1
+inc A
+add 0x03, 2
+add C, A
+A<100 : jmp 1 : brk
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5
+add B, 5

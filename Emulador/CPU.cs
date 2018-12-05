@@ -8,13 +8,15 @@ namespace Emulador
 {
     class CPU
     {
-
+        public int instante = 0;
         public int[] A;
         public int[] B;
         public int[] C;
         public int[] D;
         public int[] Pi;
         public Queue<int> interrupcoes;
+
+        public List<Label> listaDeLabels = new List<Label>();
 
         public CPU()
         {
@@ -112,7 +114,7 @@ namespace Emulador
                                                 BarramentoDeEnderecos barramentoDeEnderecos,
                                                 BarramentoDeControle barramentoDeControle,
                                                 Ram ram,
-                                                Cache cacheReal)
+                                                Cache cacheMemoria)
         {
 
             int tp = Constantes.tamanhoPalavra;
@@ -154,7 +156,7 @@ namespace Emulador
 
             //instrução do endereço é armazenada no cpu
             //"prototipo" de memoria cache(cacheVirtual)
-            int[] cacheVirtual = new int[tamanho];
+            int[] nova_instrucao = new int[tamanho];
             int posicaoCacheVirtual = 0;
             int n = tamanho % Constantes.larguraBarramentoDeDados;
             int numeroBytesEnviados = 0;
@@ -163,7 +165,7 @@ namespace Emulador
                 for (int i = 0; i < tamanho / Constantes.larguraBarramentoDeDados; i++)
                 {
                     barramentoDeDados.receive(ram);
-                    barramentoDeDados.send(cacheVirtual, posicaoCacheVirtual);
+                    barramentoDeDados.send(nova_instrucao, posicaoCacheVirtual);
                     posicaoCacheVirtual += Constantes.larguraBarramentoDeDados;
 
                     //atualiza posicao do ponteiro na ram!
@@ -180,7 +182,7 @@ namespace Emulador
             while (tamanho - numeroBytesEnviados != 0)
             {
                 barramentoDeDados.receiveImpar(ram);
-                barramentoDeDados.send(cacheVirtual, posicaoCacheVirtual);
+                barramentoDeDados.send(nova_instrucao, posicaoCacheVirtual);
                 posicaoCacheVirtual += 1;
 
                 //atualiza posicao do ponteiro na ram!
@@ -193,22 +195,73 @@ namespace Emulador
                 numeroBytesEnviados++;
             }
 
+            void atualizaRam(InformacaoMMU bloco)
+            {
+                long endR = bloco.posicaoRam;
+                long posicaoCache = bloco.posicaoCache;
+                //prepara barramento de controle
+                barramentoDeControle.receive(0);
+                barramentoDeControle.send(ram);
+                //prepara barramento de endereços
+                endR = (endR * tp) + offset;
+                var endVetorR = Encoder.intToVetorByte(endR, lb);
+                barramentoDeEnderecos.receive(endVetorR.vetor);
+                barramentoDeEnderecos.send(ram);
+                //clona os dados da cache para a ram usando barramento e clock
+                for (int i = 0; i < tp / Constantes.larguraBarramentoDeDados; i++)
+                {
+                    barramentoDeDados.receive(cacheMemoria, posicaoCache);
+                    barramentoDeDados.send(ram);
+                    posicaoCache += Constantes.larguraBarramentoDeDados;
+
+                    //atualiza posicao do ponteiro na ram!
+                    endR += Constantes.larguraBarramentoDeDados;
+                    var NovoEndVetor = Encoder.intToVetorByte(endR, Constantes.larguraBarramentoDeEndereco);
+                    barramentoDeEnderecos.receive(NovoEndVetor.vetor);
+                    barramentoDeEnderecos.send(ram);
+                }
+            }
+
+            InformacaoMMU retornaSerieDeBlocos(int tamanhoBlocoNovo)
+            {
+                var r1 = cacheMemoria.tabelaBlocos.OrderBy(p => p.posicaoCache).ToList();
+                for (int i = 0; i < r1.Count-1; i++)
+                {
+                    if ((r1[i].tamanho + r1[i + 1].tamanho) >= tamanhoBlocoNovo)
+                    {
+                        r1[i].tamanho += r1[i + 1].tamanho;
+
+                        atualizaRam(r1[i + 1]);
+                        InformacaoMMU blocoParaExcluir = cacheMemoria.tabelaBlocos.Find(p => p.id_interno == r1[i + 1].id_interno);
+                        cacheMemoria.tabelaBlocos.Remove(blocoParaExcluir);
+
+                        return r1[i];
+                    }
+                }
+                return null;
+            }
 
             //armazena instrução na memoria cache (cache.vetor)
 
             //ALGORITMO DE SUBSTITUICAO
 
             //verificar se cache esta com preenchumento acima de 80%
-            if (((double)cacheReal.preenchimento / cacheReal.vetor.Length) > porcentagem)
+            if (((double)cacheMemoria.preenchimento / cacheMemoria.vetor.Length) > porcentagem)
             {
-                ////executar algoritmo de substituição
-
                 //encontrar blocos que tenham tamanho maior ou igual a instrução atual
-                var r1 = cacheReal.tabelaBlocos.Where(p => p.tamanho >= cacheVirtual.Length).ToList();
+                var r1 = cacheMemoria.tabelaBlocos.Where(p => p.tamanho >= nova_instrucao.Length).ToList(); //PONTODEPARADA
 
-                //pegar alguem que tenha numeroAtualizacoes minimo
-                var r2 = r1.OrderBy(p => p.numeroAtualizacoes).ToList();
-                InformacaoMMU blocoParaExcluir = r2[0];
+                //pegar alguem que tenha numeroAcessos minimo desempatado por instante de ultimo acesso minimo
+                InformacaoMMU blocoParaExcluir;
+                try
+                {
+                    var r2 = r1.OrderBy(p => p.numeroAcessos).ThenBy(p => p.instanteUltimoAcesso).ToList();
+                    blocoParaExcluir = r2[0];
+                }
+                catch //escolhe dois blocos em sequencia caso nenhum bloco ocupado tenha tamanho suficiente para o bloco novo
+                {
+                    blocoParaExcluir = retornaSerieDeBlocos(nova_instrucao.Length);
+                }
 
                 ////gravar novas informações em vetor cache usando barramentos
 
@@ -225,7 +278,7 @@ namespace Emulador
                 for (int i = 0; i < tp / Constantes.larguraBarramentoDeDados; i++)
                 {
                     barramentoDeDados.receive(ram);
-                    barramentoDeDados.send(cacheReal.vetor, (int)(posicaoCache));
+                    barramentoDeDados.send(cacheMemoria.vetor, (int)(posicaoCache));
                     posicaoCache += Constantes.larguraBarramentoDeDados;
 
                     //atualiza posicao do ponteiro na ram!
@@ -236,31 +289,31 @@ namespace Emulador
                 }
 
                 //cria novo bloco mmu com base nos dados carregados
-                int tamanhoBloco = cacheVirtual.Length;
+                int tamanhoBloco = nova_instrucao.Length;
                 long posicaoBlocoNaCache = blocoParaExcluir.posicaoCache;
                 long posicaoBlocoNaRam = endRam;
-                var novoBloco = new InformacaoMMU(tamanhoBloco, posicaoBlocoNaCache, posicaoBlocoNaRam);
-                cacheReal.tabelaBlocos.Add(novoBloco);
+                var novoBloco = new InformacaoMMU(tamanhoBloco, posicaoBlocoNaCache, posicaoBlocoNaRam, instante);
+                cacheMemoria.tabelaBlocos.Add(novoBloco);
 
                 //exclui bloco antigo
-                cacheReal.tabelaBlocos.Remove(blocoParaExcluir);
+                cacheMemoria.tabelaBlocos.Remove(blocoParaExcluir);
 
             }
             else // somente insere no próximo espaço vago da cache
             {
-                for (int i = 0; i < cacheVirtual.Length; i++)
+                for (int i = 0; i < nova_instrucao.Length; i++)
                 {
-                    cacheReal.vetor[cacheReal.preenchimento + i] = cacheVirtual[i];
+                    cacheMemoria.vetor[cacheMemoria.preenchimento + i] = nova_instrucao[i];
                 }
                 
 
                 //cria novo bloco mmu com base nos dados carregados
-                int tamanhoBloco = cacheVirtual.Length;
-                long posicaoBlocoNaCache = cacheReal.preenchimento; //aponta para inicio do bloco na cache
+                int tamanhoBloco = nova_instrucao.Length;
+                long posicaoBlocoNaCache = cacheMemoria.preenchimento; //aponta para inicio do bloco na cache
                 long posicaoBlocoNaRam = endRam; //endereço real do inicio da instrução na ram
-                var novoBloco = new InformacaoMMU(tamanhoBloco, posicaoBlocoNaCache, posicaoBlocoNaRam);
-                cacheReal.tabelaBlocos.Add(novoBloco);
-                cacheReal.preenchimento += cacheVirtual.Length;
+                var novoBloco = new InformacaoMMU(tamanhoBloco, posicaoBlocoNaCache, posicaoBlocoNaRam, instante);
+                cacheMemoria.tabelaBlocos.Add(novoBloco);
+                cacheMemoria.preenchimento += nova_instrucao.Length;
             }
 
 
@@ -269,11 +322,11 @@ namespace Emulador
 
 
             //identifica código da instrução
-            int codigo = cacheVirtual[Constantes.tamanhoPalavra - 1];
+            int codigo = nova_instrucao[Constantes.tamanhoPalavra - 1];
 
             //executa instrução
-            executaInstrucao(codigo, cacheVirtual, barramentoDeDados, barramentoDeEnderecos,
-                barramentoDeControle, ram, moduloES, cacheReal);
+            executaInstrucao(codigo, nova_instrucao, barramentoDeDados, barramentoDeEnderecos,
+                barramentoDeControle, ram, moduloES, cacheMemoria);
         }
 
         public void executaInstrucao(int codigo, int[] cacheVirtual, BarramentoDeDados barramentoDeDados,
@@ -359,6 +412,8 @@ namespace Emulador
                     {
                         vetorValor[tp - i - 1] = cacheReal.vetor[posicaoCache + blocoCache.tamanho - 1 - i];
                     }
+                    blocoCache.numeroAcessos++;
+                    blocoCache.instanteUltimoAcesso = instante;
                     return Decoder.byteToLongLiteral(vetorValor);
                 }
                 else//cache miss
@@ -366,13 +421,14 @@ namespace Emulador
                     //alimentar o cache com essa informação!!!
 
                     //se cache esta com preenchumento acima de 80%
-                    if ((double)(cacheReal.preenchimento / cacheReal.vetor.Length) > porcentagem)
+                    if (((double)cacheReal.preenchimento / cacheReal.vetor.Length) > porcentagem)
                     {
                         //encontrar blocos que tenham tamanho maior ou igual a uma palavra
                         var r1 = cacheReal.tabelaBlocos.Where(p => p.tamanho >= Constantes.tamanhoPalavra).ToList();
-                        //pegar alguem que tenha numeroAcessos minimo
-                        var r2 = r1.OrderBy(p => p.numeroAtualizacoes).ToList();
+                        //pegar alguem que tenha numeroAcessos minimo desempatado por instante
+                        var r2 = r1.OrderBy(p => p.numeroAcessos).ThenBy(p => p.instanteUltimoAcesso).ToList();
                         InformacaoMMU blocoParaExcluir = r2[0];
+                        atualizaRam(blocoParaExcluir);//atualiza ram antes de excluir bloco
                         //gravar novas informações em vetor cache
                         //lembrar de usar barramentos para carregar novas informações na cache
                         long posicaoCache = blocoParaExcluir.posicaoCache;
@@ -391,25 +447,21 @@ namespace Emulador
                             barramentoDeDados.receive(ram);
                             barramentoDeDados.send(cacheReal.vetor, (int)(posicaoCache));
                             posicaoCache += Constantes.larguraBarramentoDeDados;
-
                             //atualiza posicao do ponteiro na ram!
                             end += Constantes.larguraBarramentoDeDados;
                             var NovoEndVetor = Encoder.intToVetorByte(end, Constantes.larguraBarramentoDeEndereco);
                             barramentoDeEnderecos.receive(NovoEndVetor.vetor);
                             barramentoDeEnderecos.send(ram);
                         }
-
                         //cria novo bloco mmu com base nos dados carregados
                         int tamanho = tp;
                         long posicao = blocoParaExcluir.posicaoCache;
                         long posicaoRam = endRam;
-                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam);
+                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam, instante);
                         cacheReal.tabelaBlocos.Add(novoBloco);
-
+                        novoBloco.numeroAcessos--;//como a função será chamada em recursão é preciso tirar um acesso aqui
                         //exclui bloco antigo
                         cacheReal.tabelaBlocos.Remove(blocoParaExcluir);
-                        //atualiza informação de preenchimento
-                        //cacheReal.preenchimento += tamanho;
                         //executa função novamente, necessariamente teremos um cache hit
                         return leituraValorEndereco(endParametro);
                     }
@@ -444,8 +496,9 @@ namespace Emulador
                         int tamanho = tp;
                         long posicao = cacheReal.preenchimento;
                         long posicaoRam = endRam;
-                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam);
+                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam, instante);
                         cacheReal.tabelaBlocos.Add(novoBloco);
+                        novoBloco.numeroAcessos--;//como a função será chamada em recursão é preciso tirar um acesso aqui
                         //atualiza informação de preenchimento
                         cacheReal.preenchimento += tamanho;
                         //executa função novamente, necessariamente teremos um cache hit
@@ -479,6 +532,33 @@ namespace Emulador
                 */
             }
 
+            void atualizaRam(InformacaoMMU bloco)
+            {
+                long end = bloco.posicaoRam;
+                long posicaoCache = bloco.posicaoCache;
+                //prepara barramento de controle
+                barramentoDeControle.receive(0);
+                barramentoDeControle.send(ram);
+                //prepara barramento de endereços
+                end = (end * tp) + offset;
+                var endVetor = Encoder.intToVetorByte(end, lb);
+                barramentoDeEnderecos.receive(endVetor.vetor);
+                barramentoDeEnderecos.send(ram);
+                //clona os dados da cache para a ram usando barramento e clock
+                for (int i = 0; i < tp / Constantes.larguraBarramentoDeDados; i++)
+                {
+                    barramentoDeDados.receive(cacheReal, posicaoCache);
+                    barramentoDeDados.send(ram);
+                    posicaoCache += Constantes.larguraBarramentoDeDados;
+
+                    //atualiza posicao do ponteiro na ram!
+                    end += Constantes.larguraBarramentoDeDados;
+                    var NovoEndVetor = Encoder.intToVetorByte(end, Constantes.larguraBarramentoDeEndereco);
+                    barramentoDeEnderecos.receive(NovoEndVetor.vetor);
+                    barramentoDeEnderecos.send(ram);
+                }
+            }
+
             void escritaValorEndereco(long valor, long end)
             {
                 long endRam = (end * tp) + offset;
@@ -495,7 +575,6 @@ namespace Emulador
                     {
                         cacheReal.vetor[posicaoCache + blocoCache.tamanho - 1 - i] = vetorValor[vetorValor.Length - 1 - i];
                     }
-                    
                     //verifica se quando numeroAtualizações receber incremento deverá atualizar a ram
                     if ((blocoCache.numeroAtualizacoes + 1) % Constantes.taxaDeAtualizacaoCacheParaRam == 0)
                     {
@@ -520,10 +599,9 @@ namespace Emulador
                             barramentoDeEnderecos.receive(NovoEndVetor.vetor);
                             barramentoDeEnderecos.send(ram);
                         }
-
                     }
                     blocoCache.numeroAtualizacoes++;
-
+                    blocoCache.instanteUltimoAcesso = instante;
                 }
                 else
                 {
@@ -531,13 +609,14 @@ namespace Emulador
                     //alimentar o cache com essa informação!!!
 
                     //se cache esta com preenchumento acima de 80%
-                    if ((double)(cacheReal.preenchimento / cacheReal.vetor.Length) > porcentagem)
+                    if (((double)cacheReal.preenchimento / cacheReal.vetor.Length) > porcentagem)
                     {
                         //encontrar blocos que tenham tamanho maior ou igual a uma palavra
                         var r1 = cacheReal.tabelaBlocos.Where(p => p.tamanho >= Constantes.tamanhoPalavra).ToList();
-                        //pegar alguem que tenha numeroAcessos minimo
-                        var r2 = r1.OrderBy(p => p.numeroAtualizacoes).ToList();
+                        //pegar alguem que tenha numeroAcessos minimo desempatado por instante
+                        var r2 = r1.OrderBy(p => p.numeroAcessos).ThenBy(p => p.instanteUltimoAcesso).ToList();
                         InformacaoMMU blocoParaExcluir = r2[0];
+                        atualizaRam(blocoParaExcluir);//atualiza ram antes de excluir bloco
                         //gravar novas informações em vetor cache
                         long posicaoCache = blocoParaExcluir.posicaoCache;
                         int[] vetorValor = Encoder.literalByte(valor);//vetor em bytes contendo literal a ser gravado
@@ -551,7 +630,7 @@ namespace Emulador
                         int tamanho = tp;
                         long posicao = blocoParaExcluir.posicaoCache;
                         long posicaoRam = endRam;
-                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam);
+                        var novoBloco = new InformacaoMMU(tamanho, posicao, posicaoRam, instante);
                         cacheReal.tabelaBlocos.Add(novoBloco);
                         novoBloco.numeroAtualizacoes++;//este valor já é criado com diferença entre o valor em cache e o valor em ram
 
@@ -565,7 +644,7 @@ namespace Emulador
                         //cria novo bloco com base nos dados carregados
                         int tamanho = tp;
                         long posicaoRam = endRam;
-                        var novoBloco = new InformacaoMMU(tamanho, posicaoCache, posicaoRam);
+                        var novoBloco = new InformacaoMMU(tamanho, posicaoCache, posicaoRam, instante);
                         cacheReal.tabelaBlocos.Add(novoBloco);
                         novoBloco.numeroAtualizacoes++;//este valor já é criado com diferença entre o valor em cache e o valor em ram
                         //atualiza informação de preenchimento
@@ -1041,7 +1120,73 @@ namespace Emulador
                 escritaValorEndereco(mult, end1);
                 vetorResultado = Encoder.literalByte(mult);
             }
-            enviaResultadoParaBuffer(vetorResultado);
+
+            //instrução label i
+            if (codigo == 50)
+            {
+                int valorL1 = (int)valorLiteral(1, 0);
+                var r1 = cacheReal.tabelaBlocos.OrderByDescending(p => p.id_interno).ToList();
+                Label label = new Label(valorL1, r1[0]);
+                listaDeLabels.Add(label);
+            }
+
+            //loop => A<100 : jmp 1 : brk = loop 1, A, 100 = [0,51,0,1,0,0,0,100]
+            if (codigo == 51)
+            {
+                int codR1 = identificaCodigoRegistrador(2, 0);
+                long valorR1 = valorRegistrador(codR1);
+                int idLabel = (int)valorLiteral(1, 0);
+                long valorLimite = valorLiteral(3, 0);
+
+                //leitura da posicao CACHE da label
+                var pos = this.listaDeLabels.FindIndex(p => p.id == idLabel);
+                var labelCache = listaDeLabels[pos].bloco.posicaoCache;
+
+                //leitura da posicao CACHE da instrucao loop
+                long loopCache = cacheReal.tabelaBlocos.Find(p => p.instanteUltimoAcesso == instante).posicaoCache;
+
+                //lista instrucoes dentro do loop
+                var r1 = cacheReal.tabelaBlocos.Where(p => p.posicaoCache > labelCache && p.posicaoCache < loopCache).ToList();
+                while (valorR1 < valorLimite)
+                {
+                    foreach (var item in r1)
+                    {
+                        if (item.tamanho > tp) // garante que não vai tentar executar um valor de posição de memoria que esteja na cache
+                        {
+                            this.Pi[1] = (int)item.posicaoRam; 
+                            executaInstrucaoLoop(item);
+                            item.numeroAcessos++;
+                            item.instanteUltimoAcesso = instante;
+                        }
+                    }
+
+                    valorR1 = valorRegistrador(codR1);
+                }
+            }
+
+
+            //enviaResultadoParaBuffer(vetorResultado);
+            this.instante++;
+
+
+            int[] capturaInstrucao(InformacaoMMU bloco)
+            {
+                int[] instrucao = new int[bloco.tamanho];
+                for (int i = 0; i < bloco.tamanho; i++)
+                {
+                    instrucao[i] = cacheReal.vetor[bloco.posicaoCache + i];
+                }
+                return instrucao;
+            }
+
+            void executaInstrucaoLoop(InformacaoMMU bloco)
+            {
+                int[] instrucao = capturaInstrucao(bloco);
+                int cod = cacheReal.vetor[bloco.posicaoCache + tp - 1];
+                executaInstrucao(cod, instrucao, barramentoDeDados, barramentoDeEnderecos, barramentoDeControle, ram, ModuloES, cacheReal);
+            }
+
+
         }
 
     }

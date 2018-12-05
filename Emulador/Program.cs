@@ -104,7 +104,7 @@ namespace Emulador {
 
             void emuladorTimer() {
                 Console.Clear();
-                mostrarDados();
+                mostrarDadosComCache();
                 SetTimer();
                 Console.Read();
                 aTimer.Stop();
@@ -162,7 +162,7 @@ namespace Emulador {
             void executarRajada() {
                 cpu.executaTodasInterrupcoes(moduloES, barramentoDeDados, barramentodeEnderecos,
                 barramentoDeControle, ram, cache);
-                moduloES.ResultadoBuffer();
+                //moduloES.ResultadoBuffer();
             }
 
             bool testeBufferVazio() {
@@ -180,7 +180,7 @@ namespace Emulador {
                 Console.Clear();
                 enviarRajada();
                 executarRajada();
-                mostrarDados();
+                mostrarDadosComCache();
             }
 
             void OnTimedEvent(Object source, ElapsedEventArgs e) {

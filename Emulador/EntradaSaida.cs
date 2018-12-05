@@ -98,6 +98,15 @@ namespace Emulador {
             int tp = Constantes.tamanhoPalavra;
             int lb = Constantes.larguraBarramentoDeEndereco;
 
+            if (codigo == 50)
+            {
+                return 2 * tp;
+            }
+            if (codigo == 51)
+            {
+                return 4 * tp;
+            }
+
             if (codigo == 1) {
                 return 3 * tp;
             }

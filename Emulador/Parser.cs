@@ -24,9 +24,10 @@ namespace Emulador {
             transformar inteiros em bytes deve ser feito somente do encoder!
         */
 
-        
 
-        public static List<dynamic> separaGrupos(string fonte) {
+
+        public static List<dynamic> separaGrupos(string fonte)
+        {
             /*
              * Recebe um string e verifica sintaxa executando verificaSintaxe()
              * verificaSintaxe() transforma string de entrada em tipo Match
@@ -34,23 +35,55 @@ namespace Emulador {
              * (string) do grupo x (do Match)
              */
 
-            Match instrucao = verificaSintaxe(fonte);
+            if (!Regex.IsMatch(fonte, @"([A-Z])<(\d+)\s+:\s+jmp\s+(\d+)\s+:\s+brk"))
+            {
 
-            var grupos = new List<dynamic>();
-            for (int i = 0; i < instrucao.Groups.Count; i++) {
-                grupos.Add(instrucao.Groups[i].Value);
+                Match instrucao = verificaSintaxe(fonte);
+
+                var grupos = new List<dynamic>();
+                for (int i = 0; i < instrucao.Groups.Count; i++)
+                {
+                    grupos.Add(instrucao.Groups[i].Value);
+                }
+
+                return grupos;
             }
+            else
+            {
+                Match instrucao = verificaSintaxe(fonte);
 
-            return grupos;
+                var grupos = new List<dynamic>();
+
+                grupos.Add(fonte);
+                grupos.Add("loop");
+                grupos.Add(instrucao.Groups[3].Value);
+                grupos.Add(instrucao.Groups[1].Value);
+                grupos.Add(instrucao.Groups[2].Value);
+
+                return grupos;
+
+            }
         }
 
-
+        
 
         public static Match verificaSintaxe(string fonte) {
             /* Recebe uma string e retorna um objeto do tipo Match caso a string seja uma instrução bem formada
              * Para acessar os grupos de captura:
              * string contida no grupo x vai estar em Match.Groups[x].Value
              */
+
+            //instrucão de código 50
+            if (Regex.IsMatch(fonte, @"(lbl)\s+(\d+)"))
+            {
+                return Regex.Match(fonte, @"(lbl)\s+(\d+)");
+            }
+            //instrucão de código 51
+            if (Regex.IsMatch(fonte, @"([A-Z])<(\d+)\s+:\s+jmp\s+(\d+)\s+:\s+brk"))
+            {
+                return Regex.Match(fonte, @"([A-Z])<(\d+)\s+:\s+jmp\s+(\d+)\s+:\s+brk");
+            }
+
 
             //instrução de código 1
             if (Regex.IsMatch(fonte, @"(add)\s+([A-Z]),\s+(\d+|-\d+)")) {
